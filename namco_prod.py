@@ -67,10 +67,12 @@ class AppConfig:
     lottery_open: str = ""          # "2026-07-04T10:00:00+09:00" or "HH:MM" (today JST)
     pre_login_minutes: int = 10     # login this many minutes before lottery_open
     keepalive_interval: int = 60    # seconds between session keepalive pings
+    race_mode: bool = True          # warmup/racetest: strip polite delays + rate limit for max speed
     db_path: str = "namco_tasks.db"
     log_level: str = "INFO"
     mode: str = "checkout"
     results_file: str = "results.jsonl"
+    speed_report: str = "speed_report.json"
 
     @classmethod
     def load(cls, path: str = "config.toml") -> "AppConfig":
@@ -125,10 +127,12 @@ class AppConfig:
             lottery_open=raw.get("lottery_open", ""),
             pre_login_minutes=raw.get("pre_login_minutes", 10),
             keepalive_interval=raw.get("keepalive_interval", 60),
+            race_mode=raw.get("race_mode", True),
             db_path=raw.get("db_path", "namco_tasks.db"),
             log_level=raw.get("log_level", "INFO"),
             mode=raw.get("mode", "checkout"),
             results_file=raw.get("results_file", "results.jsonl"),
+            speed_report=raw.get("speed_report", "speed_report.json"),
         )
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -442,9 +446,13 @@ class ManagedSession:
         self._account_id = account_id
         self._log = logging.getLogger(f"namco.sess.{account_id[:20]}")
         self._tb = TokenBucket(cfg.requests_per_second, cfg.rate_burst)
+        self._race = cfg.race_mode      # True → bypass rate limiter & polite delays
         self.client: Optional[httpx.AsyncClient] = None
         self.signals = SessionSignals()
         self._last_url: str = BASE_URL + "/"
+        # Pre-staged data (filled during warmup so T=0 starts at the competitive POST)
+        self.staged_ticket: Optional[Dict] = None
+        self.staged_cart_data: Optional[Dict] = None
 
     async def __aenter__(self) -> "ManagedSession":
         kw: Dict[str, Any] = dict(
@@ -463,6 +471,8 @@ class ManagedSession:
             await self.client.aclose()
 
     async def _delay_polite(self):
+        if self._race:
+            return  # race mode: no polite delays — every ms counts in a 1-2s window
         d = random.uniform(self._cfg.delay_min, self._cfg.delay_max)
         self._log.debug(f"polite {d:.1f}s")
         await asyncio.sleep(d)
@@ -493,7 +503,8 @@ class ManagedSession:
                 sg.captcha += 1
 
     async def _do_get(self, path: str, **kw) -> httpx.Response:
-        await self._tb.acquire()
+        if not self._race:
+            await self._tb.acquire()
         url = f"{BASE_URL}{path}" if path.startswith("/") else path
         t0 = time.time()
         resp = await self.client.get(url, **kw)
@@ -505,7 +516,8 @@ class ManagedSession:
         return resp
 
     async def _do_post(self, path: str, data: Optional[Dict] = None, **kw) -> httpx.Response:
-        await self._tb.acquire()
+        if not self._race:
+            await self._tb.acquire()
         url = f"{BASE_URL}{path}" if path.startswith("/") else path
         hdrs = kw.pop("headers", {})
         hdrs.setdefault("Referer", self._last_url)
@@ -766,23 +778,36 @@ async def step_find_ticket(s: ManagedSession, cfg: AppConfig, store: str) -> Opt
     return tickets[0] if tickets else None
 
 
-async def step_add_cart(s: ManagedSession, ticket: Dict, slot_index: int = -1) -> bool:
+async def prepare_cart_form(s: ManagedSession, ticket: Dict, slot_index: int = -1) -> Optional[Dict]:
+    """GET ticket detail page + parse the cart form. Safe to call during warmup
+    (read-only) so the competitive POST at T=0 needs no prior fetch."""
     resp = await s.get(ticket["url"])
     if resp.status_code != 200:
         s._log.error(f"Ticket page {resp.status_code}")
-        return False
+        return None
 
     soup = BeautifulSoup(resp.text, "html.parser")
     cart_form = find_cart_form(soup)
     if not cart_form:
         s._log.error("No cart form on ticket page")
-        return False
+        return None
 
     overrides = {"PRIORITY_ITEMPROPERTY_CD_MATRIX_0": slot_index} if slot_index >= 0 else None
     form_data = _parse_form_element(cart_form, slot_overrides=overrides)
     form_data["request"] = "insert"
     if slot_index >= 0:
         s._log.info(f"Slot index {slot_index} → {form_data.get('PRIORITY_ITEMPROPERTY_CD_MATRIX_0', '?')}")
+    return form_data
+
+
+async def step_add_cart(s: ManagedSession, ticket: Dict, slot_index: int = -1,
+                        prepared_form: Optional[Dict] = None) -> bool:
+    # Use pre-staged form if available (race mode), else prepare it now
+    form_data = prepared_form
+    if form_data is None:
+        form_data = await prepare_cart_form(s, ticket, slot_index)
+        if form_data is None:
+            return False
 
     await s._delay_polite()
     resp = await s.post("/cart_index.html", data=form_data)
@@ -919,18 +944,28 @@ async def _do_booking(
     fsm: "BookingFSM",
     log: logging.Logger,
 ) -> None:
-    """Core booking flow starting from FIND (assumes session already logged in)."""
+    """Core booking flow starting from FIND (assumes session already logged in).
+    If the session was pre-staged during warmup, FIND + ticket-page fetch are
+    skipped so the first action at T=0 is the competitive cart POST."""
     t0 = rec["_t0"]
-    step_ms = rec["step_ms"]
+    step_ms = rec["step_ms"]          # per-step duration (ms)
+    fire_t0 = rec.get("_fire_t0", t0) # common T=0 across all accounts (fire moment)
+    fire_off = rec["fire_offset_ms"]  # ms since T=0 when each step COMPLETED
 
-    # FIND TICKET
-    _t = time.time()
+    # FIND TICKET — use pre-staged ticket if available (warmup)
+    if s.staged_ticket is not None:
+        ticket = s.staged_ticket
+        step_ms["find"] = 0
+        rec["staged"] = True
+    else:
+        _t = time.time()
+        ticket = await step_find_ticket(s, cfg, account.target_store)
+        step_ms["find"] = _ts_ms(_t)
+        if not ticket:
+            fsm.go(FlowState.FIND); fsm.fail("no ticket")
+            rec["error"] = "No matching ticket found"; return
+
     fsm.go(FlowState.FIND); rec["states"].append("FIND")
-    ticket = await step_find_ticket(s, cfg, account.target_store)
-    step_ms["find"] = _ts_ms(_t)
-    if not ticket:
-        fsm.fail("no ticket"); rec["error"] = "No matching ticket found"; return
-
     rec["ticket"] = ticket["name"]
     log.info(f"Ticket: {ticket['name']}")
 
@@ -940,12 +975,14 @@ async def _do_booking(
 
     await s._delay_polite()
 
-    # ADD TO CART
+    # ADD TO CART — the competitive action; use staged form to skip the GET
     _t = time.time()
     fsm.go(FlowState.CART); rec["states"].append("CART")
-    if not await step_add_cart(s, ticket, account.slot_index):
+    if not await step_add_cart(s, ticket, account.slot_index, prepared_form=s.staged_cart_data):
         fsm.fail("cart failed"); rec["error"] = "Add to cart failed"; return
     step_ms["cart"] = _ts_ms(_t)
+    fire_off["cart"] = _ts_ms(fire_t0)
+    log.info(f"⚡ CART secured at T+{fire_off['cart']}ms")
 
     if cfg.mode == "cart":
         fsm.go(FlowState.DONE); rec["states"].append("DONE")
@@ -964,6 +1001,7 @@ async def _do_booking(
     fsm.go(FlowState.CHECKOUT); rec["states"].append("CHECKOUT")
     seisan_html = await step_checkout(s, cart_data)
     step_ms["seisan"] = _ts_ms(_t)
+    fire_off["seisan"] = _ts_ms(fire_t0)
     if not seisan_html:
         fsm.fail("checkout failed"); rec["error"] = "Checkout failed"; return
 
@@ -993,21 +1031,28 @@ async def _do_booking(
         fsm.fail("complete failed"); rec["error"] = "Order completion failed"
 
     step_ms["total"] = _ts_ms(t0)
+    fire_off["complete"] = _ts_ms(fire_t0)
 
 
 def _finish_record(rec: Dict, fsm: "BookingFSM", results_path: str, log: logging.Logger):
     rec.pop("_t0", None)
+    rec.pop("_fire_t0", None)
     rec["finished_at"] = _now()
     rec["final_state"] = fsm.state.value
     with open(results_path, "a", encoding="utf-8") as f:
         f.write(json.dumps(rec, ensure_ascii=False) + "\n")
     if rec["success"]:
         ms = rec["step_ms"]
+        off = rec.get("fire_offset_ms", {})
+        cart_off = off.get("cart")
         print(f"\n{'='*60}")
         print(f"  SUCCESS  {rec['account']}")
         print(f"  Order:   {rec['order_number']}")
         print(f"  Ticket:  {rec['ticket']}")
-        print(f"  Timing:  login={ms.get('login','?')}ms find={ms.get('find','?')}ms cart={ms.get('cart','?')}ms total={ms.get('total','?')}ms")
+        print(f"  Steps:   cart={ms.get('cart','?')}ms seisan={ms.get('seisan','?')}ms "
+              f"confirm={ms.get('confirm','?')}ms complete={ms.get('complete','?')}ms total={ms.get('total','?')}ms")
+        if cart_off is not None:
+            print(f"  ⚡ T=0→cart: {cart_off}ms   T=0→done: {off.get('complete','?')}ms")
         print(f"{'='*60}")
     else:
         log.warning(f"FAILED {rec['account']}: {rec.get('error','—')}")
@@ -1043,6 +1088,7 @@ async def run_account(
         "error": None,
         "states": [],
         "step_ms": {},
+        "fire_offset_ms": {},
     }
 
     try:
@@ -1077,13 +1123,16 @@ async def run_prewarmed(
     account: AccountConfig,
     cfg: AppConfig,
     results_path: str,
+    fire_t0: Optional[float] = None,
 ) -> Dict:
-    """Run booking with an already-logged-in session (warmup mode)."""
+    """Run booking with an already-logged-in session (warmup mode).
+    fire_t0 = common T=0 perf reference shared across all accounts (the fire moment)."""
     log = logging.getLogger(f"namco.worker.{account.email[:20]}")
     fsm = BookingFSM(account.email)
     t0 = time.time()
     rec: Dict[str, Any] = {
         "_t0": t0,
+        "_fire_t0": fire_t0 if fire_t0 is not None else t0,
         "account": account.email,
         "target_store": account.target_store,
         "slot_index": account.slot_index,
@@ -1094,10 +1143,13 @@ async def run_prewarmed(
         "order_number": None,
         "ticket": None,
         "error": None,
+        "fire_offset_ms": {},
         "states": ["LOGIN"],   # already logged in
         "step_ms": {"login": 0},
         "warmed": True,
     }
+    # Session already authenticated during warmup — advance FSM past LOGIN
+    fsm.go(FlowState.LOGIN)
     try:
         await _do_booking(s, account, cfg, rec, fsm, log)
     except Exception as e:
@@ -1178,6 +1230,37 @@ class WarmupScheduler:
         )
         return ok_count
 
+    async def stage_all(self):
+        """Pre-fetch ticket page + parse cart form for every live session, so the
+        first action at T=0 is the competitive cart POST (no GET on the hot path)."""
+        account_map = {a.email: a for a in self._cfg.accounts}
+        sem = asyncio.Semaphore(self._cfg.max_concurrent)
+
+        async def _stage_one(email: str, s: ManagedSession):
+            acc = account_map.get(email)
+            if not acc:
+                return
+            async with sem:
+                try:
+                    ticket = await step_find_ticket(s, self._cfg, acc.target_store)
+                    if not ticket:
+                        self._log.warning(f"Stage: no ticket for {email}")
+                        return
+                    form = await prepare_cart_form(s, ticket, acc.slot_index)
+                    if form is None:
+                        self._log.warning(f"Stage: no cart form for {email}")
+                        return
+                    s.staged_ticket = ticket
+                    s.staged_cart_data = form
+                    self._log.info(f"Staged ✓ {email} → {ticket['name'][:30]}")
+                except Exception as e:
+                    self._log.warning(f"Stage error {email}: {e}")
+
+        self._log.info(f"Staging {len(self._sessions)} sessions (pre-fetch ticket + form) …")
+        await asyncio.gather(*[_stage_one(e, s) for e, s in self._sessions.items()])
+        staged = sum(1 for s in self._sessions.values() if s.staged_cart_data is not None)
+        self._log.info(f"Staged {staged}/{len(self._sessions)} sessions ready for T=0")
+
     async def keepalive_until(self, target: datetime):
         interval = self._cfg.keepalive_interval
 
@@ -1203,8 +1286,10 @@ class WarmupScheduler:
     async def fire_all(self) -> List[Dict]:
         self._log.info(f"🔥 FIRING {len(self._sessions)} sessions simultaneously!")
         account_map = {a.email: a for a in self._cfg.accounts}
+        # Single common T=0 reference so every account's offsets are comparable
+        fire_t0 = time.time()
         tasks = [
-            run_prewarmed(s, account_map[email], self._cfg, self._results_path)
+            run_prewarmed(s, account_map[email], self._cfg, self._results_path, fire_t0=fire_t0)
             for email, s in self._sessions.items()
             if email in account_map
         ]
@@ -1323,6 +1408,153 @@ def print_summary(results: List[Dict], log: logging.Logger):
     print("=" * 60)
     METRICS.report(log)
 
+
+def _percentiles(vals: List[int]) -> Dict[str, int]:
+    if not vals:
+        return {}
+    s = sorted(vals)
+    def pct(p: float) -> int:
+        if len(s) == 1:
+            return s[0]
+        k = (len(s) - 1) * p
+        f = int(k)
+        c = min(f + 1, len(s) - 1)
+        return int(s[f] + (s[c] - s[f]) * (k - f))
+    return {
+        "min": s[0], "p50": pct(0.50), "p95": pct(0.95),
+        "p99": pct(0.99), "max": s[-1], "mean": int(sum(s) / len(s)),
+    }
+
+
+def build_speed_report(results: List[Dict], cfg: AppConfig, log: logging.Logger) -> Dict:
+    """Aggregate per-step & fire-offset timing across all accounts, save + display.
+    This is the data that drives 'gradually optimize speed' for the 1-2s window."""
+    ok = [r for r in results if r.get("success")]
+
+    # Collect step durations
+    step_keys = ["login", "find", "cart", "seisan", "confirm", "complete", "total"]
+    step_stats = {}
+    for k in step_keys:
+        vals = [r["step_ms"][k] for r in results if r.get("step_ms", {}).get(k) is not None]
+        if vals:
+            step_stats[k] = _percentiles(vals)
+
+    # Collect fire-offsets (time from T=0 to reaching each milestone) — the key metric
+    off_keys = ["cart", "seisan", "complete"]
+    offset_stats = {}
+    for k in off_keys:
+        vals = [r["fire_offset_ms"][k] for r in results
+                if r.get("fire_offset_ms", {}).get(k) is not None]
+        if vals:
+            offset_stats[k] = _percentiles(vals)
+
+    report = {
+        "generated_at": _now(),
+        "accounts": len(results),
+        "success": len(ok),
+        "step_duration_ms": step_stats,
+        "fire_offset_ms": offset_stats,
+        "per_account": [
+            {
+                "account": r["account"],
+                "success": r.get("success"),
+                "order": r.get("order_number"),
+                "step_ms": r.get("step_ms", {}),
+                "fire_offset_ms": r.get("fire_offset_ms", {}),
+            }
+            for r in results
+        ],
+    }
+
+    # Save
+    out_path = Path(cfg.speed_report)
+    if not out_path.is_absolute():
+        out_path = Path(cfg.results_file).parent / cfg.speed_report
+    with open(out_path, "w", encoding="utf-8") as f:
+        json.dump(report, f, ensure_ascii=False, indent=2)
+
+    # Display
+    print("\n" + "=" * 68)
+    print("  ⚡ 速度报告 (SPEED REPORT)")
+    print("=" * 68)
+    if offset_stats:
+        print("\n  距开抢T=0的耗时 (越小越能抢到热门场):")
+        print(f"    {'里程碑':<12}{'min':>8}{'p50':>8}{'p95':>8}{'p99':>8}{'max':>8}")
+        names = {"cart": "抢到名额", "seisan": "进结算", "complete": "下单完成"}
+        for k in off_keys:
+            if k in offset_stats:
+                st = offset_stats[k]
+                print(f"    {names[k]:<10}{st['min']:>8}{st['p50']:>8}{st['p95']:>8}{st['p99']:>8}{st['max']:>8}")
+    print("\n  各步骤耗时 (ms, 找瓶颈):")
+    print(f"    {'步骤':<12}{'min':>8}{'p50':>8}{'p95':>8}{'p99':>8}{'max':>8}")
+    labels = {"login":"登录","find":"找票","cart":"加购","seisan":"结算","confirm":"确认","complete":"完成","total":"总计"}
+    for k in step_keys:
+        if k in step_stats:
+            st = step_stats[k]
+            print(f"    {labels[k]:<10}{st['min']:>8}{st['p50']:>8}{st['p95']:>8}{st['p99']:>8}{st['max']:>8}")
+    print("=" * 68)
+    print(f"  → 已保存: {out_path}")
+    print("=" * 68)
+    return report
+
+
+async def run_racetest(cfg: AppConfig, log: logging.Logger, rounds: int = 3) -> Dict:
+    """安全测速：登录 → 找票 → 解析加购表单，重复 N 轮，测可控链路网络/服务器延迟。
+    不做任何 POST 提交，不消耗账号的「一人一店一次」额度。"""
+    log.info(f"RACETEST | {len(cfg.accounts)} accounts × {rounds} rounds (read-only, no submit)")
+    sem = asyncio.Semaphore(cfg.max_concurrent)
+    samples: Dict[str, List[int]] = {"login": [], "find": [], "prepare": [], "ready_total": []}
+
+    async def _one(acc: AccountConfig, rnd: int):
+        async with sem:
+            try:
+                async with ManagedSession(acc.proxy or "", cfg, acc.email) as s:
+                    t_all = time.time()
+                    _t = time.time()
+                    if not await step_login(s, acc.email, acc.password):
+                        log.warning(f"[r{rnd}] login failed {acc.email}")
+                        return
+                    samples["login"].append(_ts_ms(_t))
+                    _t = time.time()
+                    ticket = await step_find_ticket(s, cfg, acc.target_store)
+                    samples["find"].append(_ts_ms(_t))
+                    if not ticket:
+                        return
+                    _t = time.time()
+                    form = await prepare_cart_form(s, ticket, acc.slot_index)
+                    samples["prepare"].append(_ts_ms(_t))
+                    if form is not None:
+                        samples["ready_total"].append(_ts_ms(t_all))
+            except Exception as e:
+                log.warning(f"[r{rnd}] racetest error {acc.email}: {e}")
+
+    for rnd in range(1, rounds + 1):
+        log.info(f"--- round {rnd}/{rounds} ---")
+        await asyncio.gather(*[_one(acc, rnd) for acc in cfg.accounts])
+
+    print("\n" + "=" * 60)
+    print("  ⚡ RACETEST 测速结果 (可控链路, 不含竞争POST)")
+    print("=" * 60)
+    print(f"    {'步骤':<14}{'min':>7}{'p50':>7}{'p95':>7}{'max':>7}{'n':>6}")
+    labels = {"login":"登录","find":"找票","prepare":"解析加购表单","ready_total":"就绪总耗时"}
+    stats = {}
+    for k in ["login", "find", "prepare", "ready_total"]:
+        st = _percentiles(samples[k])
+        stats[k] = st
+        if st:
+            print(f"    {labels[k]:<12}{st['min']:>7}{st['p50']:>7}{st['p95']:>7}{st['max']:>7}{len(samples[k]):>6}")
+    print("=" * 60)
+    print("  注：'就绪总耗时'=从零到可发起抢购POST的时间。warmup预热后此项≈0，")
+    print("      因为登录+找票+表单都已在开抢前完成，T=0直接POST抢名额。")
+    print("=" * 60)
+
+    report = {"generated_at": _now(), "rounds": rounds, "stats": stats}
+    out_path = Path(cfg.results_file).parent / "racetest_report.json"
+    with open(out_path, "w", encoding="utf-8") as f:
+        json.dump(report, f, ensure_ascii=False, indent=2)
+    print(f"  → 已保存: {out_path}\n")
+    return report
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Main
 # ─────────────────────────────────────────────────────────────────────────────
@@ -1341,6 +1573,11 @@ async def main():
     )
     if cfg.slot_weights:
         log.info(f"Slot weights: {cfg.slot_weights} (total={sum(cfg.slot_weights)} accounts per cycle)")
+
+    # ── Racetest mode (safe speed benchmark, no submit) ───────────────────────
+    if cfg.mode == "racetest":
+        await run_racetest(cfg, log, rounds=3)
+        return []
 
     # ── Warmup mode ──────────────────────────────────────────────────────────
     if cfg.mode == "warmup":
@@ -1367,11 +1604,15 @@ async def main():
             log.error("All warmup logins failed — aborting")
             return []
 
+        # Pre-stage ticket + cart form so T=0 starts at the competitive POST
+        await scheduler.stage_all()
+
         await scheduler.keepalive_until(lottery_open)
 
         log.info(f"Lottery open! Firing all {ok} sessions …")
         results = await scheduler.fire_all()
         print_summary(results, log)
+        build_speed_report(results, cfg, log)
         return results
 
     # ── Normal / scheduled mode ───────────────────────────────────────────────
@@ -1389,6 +1630,7 @@ async def main():
 
     results = await run_scheduler(cfg, queue, proxy_pool)
     print_summary(results, log)
+    build_speed_report(results, cfg, log)
     return results
 
 

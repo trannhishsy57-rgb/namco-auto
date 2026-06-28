@@ -93,6 +93,11 @@ class AppConfig:
         weights = tgt.get("slot_weights", [])
         if weights:
             total = sum(weights)
+            if total == 0:
+                raise ValueError(
+                    "slot_weights 全部为 0。不分配请留空 []（全部选第一个可用时段）；"
+                    "按权重分配请填正整数，例如 [300,100,100,100,100,100,100,100]。"
+                )
             cumulative: List[int] = []
             c = 0
             for w in weights:
@@ -589,7 +594,14 @@ class ManagedSession:
                 continue
             if resp.status_code != 503:
                 if self._cb_active():
-                    await CIRCUIT.record_success()
+                    # 5xx / 403 (IP ban) / 429 (rate limit) count as breaker failures —
+                    # otherwise a sustained 403 never trips the breaker and every account
+                    # keeps hammering a blocked IP. Not retried (retrying a ban is
+                    # pointless), just returned to the caller.
+                    if resp.status_code >= 500 or resp.status_code in (403, 429):
+                        await CIRCUIT.record_failure()
+                    else:
+                        await CIRCUIT.record_success()
                 return resp
             if self._cb_active():
                 await CIRCUIT.record_failure()
@@ -619,7 +631,14 @@ class ManagedSession:
                 continue
             if resp.status_code != 503:
                 if self._cb_active():
-                    await CIRCUIT.record_success()
+                    # 5xx / 403 (IP ban) / 429 (rate limit) count as breaker failures —
+                    # otherwise a sustained 403 never trips the breaker and every account
+                    # keeps hammering a blocked IP. Not retried (retrying a ban is
+                    # pointless), just returned to the caller.
+                    if resp.status_code >= 500 or resp.status_code in (403, 429):
+                        await CIRCUIT.record_failure()
+                    else:
+                        await CIRCUIT.record_success()
                 return resp
             if self._cb_active():
                 await CIRCUIT.record_failure()
@@ -801,11 +820,15 @@ async def step_login(s: ManagedSession, email: str, password: str) -> bool:
 
     resp = await s.post("/top_login.html", data=payload)
 
-    if "ログアウト" in resp.text or "マイページ" in resp.text:
+    # Require the logout link AND that we weren't bounced back to the login page.
+    # "マイページ" alone is too loose — Ebisu renders it on the login page and the
+    # password-error page too, which would mark failed logins as success and send
+    # every later request into a redirect-to-login loop.
+    if "ログアウト" in resp.text and "/login.html" not in str(resp.url):
         METRICS.inc("login.ok")
         return True
     METRICS.inc("login.fail")
-    s._log.error("Login failed — no logout link in response")
+    s._log.error("Login failed — no logout link (or bounced back to login page)")
     return False
 
 
@@ -893,17 +916,24 @@ async def step_add_cart(s: ManagedSession, ticket: Dict, slot_index: int = -1,
         METRICS.inc("cart.ok")
         return True
 
+    # JSON response: trust it only if it actually signals success — never blindly.
     try:
         j = resp.json()
         s._log.debug(f"Cart JSON: {str(j)[:200]}")
-        METRICS.inc("cart.ok")
-        return True
+        blob = str(j).lower()
+        if "error" not in blob and ("追加" in str(j) or "success" in blob or '"ok"' in blob):
+            METRICS.inc("cart.ok")
+            return True
     except Exception:
         pass
 
-    s._log.warning("Cart result uncertain — assuming success")
-    METRICS.inc("cart.ok")
-    return True
+    # Truly uncertain (no success phrase, no cart context, no positive JSON): treat as
+    # FAILURE so we don't run seisan→confirm→complete against an empty cart and burn
+    # the 1-2s window. The successful path always hits the "カート" check above, so
+    # reaching here means the response was an error/redirect/non-HTML body.
+    s._log.warning("Cart result uncertain — treating as FAILURE (no success signal)")
+    METRICS.inc("cart.fail")
+    return False
 
 
 async def step_get_cart(s: ManagedSession, ticket_url: str) -> Optional[Dict]:
@@ -1446,10 +1476,10 @@ class WarmupScheduler:
         account_map = {a.email: a for a in self._cfg.accounts}
         # Single common T=0 reference so every account's offsets are comparable
         fire_t0 = time.time()
+        fired = [(email, s) for email, s in self._sessions.items() if email in account_map]
         tasks = [
             run_prewarmed(s, account_map[email], self._cfg, self._results_path, fire_t0=fire_t0)
-            for email, s in self._sessions.items()
-            if email in account_map
+            for email, s in fired
         ]
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
@@ -1460,7 +1490,22 @@ class WarmupScheduler:
             except Exception:
                 pass
 
-        return [r for r in results if isinstance(r, dict)]
+        # Surface crashes instead of silently dropping them, so print_summary's total
+        # matches the number of sessions fired and crashed accounts are visible.
+        out: List[Dict] = []
+        crashed = 0
+        for (email, _), r in zip(fired, results):
+            if isinstance(r, dict):
+                out.append(r)
+            else:
+                crashed += 1
+                self._log.warning(f"Fire crash {email}: {r}")
+                out.append({"account": email, "success": False, "order_number": None,
+                            "error": f"crashed: {r}", "ticket": None,
+                            "step_ms": {}, "fire_offset_ms": {}})
+        if crashed:
+            self._log.warning(f"{crashed}/{len(fired)} session(s) crashed during fire")
+        return out
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -1589,11 +1634,13 @@ def build_speed_report(results: List[Dict], cfg: AppConfig, log: logging.Logger)
     This is the data that drives 'gradually optimize speed' for the 1-2s window."""
     ok = [r for r in results if r.get("success")]
 
-    # Collect step durations
+    # Speed stats reflect SUCCESSFUL accounts only. Failed accounts carry retry-inflated
+    # timings (multiple 503 waits etc.) that would skew p95 upward and mislead tuning,
+    # so iterate `ok`, not all `results`.
     step_keys = ["login", "find", "cart", "seisan", "confirm", "complete", "total"]
     step_stats = {}
     for k in step_keys:
-        vals = [r["step_ms"][k] for r in results if r.get("step_ms", {}).get(k) is not None]
+        vals = [r["step_ms"][k] for r in ok if r.get("step_ms", {}).get(k) is not None]
         if vals:
             step_stats[k] = _percentiles(vals)
 
@@ -1601,7 +1648,7 @@ def build_speed_report(results: List[Dict], cfg: AppConfig, log: logging.Logger)
     off_keys = ["cart", "seisan", "complete"]
     offset_stats = {}
     for k in off_keys:
-        vals = [r["fire_offset_ms"][k] for r in results
+        vals = [r["fire_offset_ms"][k] for r in ok
                 if r.get("fire_offset_ms", {}).get(k) is not None]
         if vals:
             offset_stats[k] = _percentiles(vals)

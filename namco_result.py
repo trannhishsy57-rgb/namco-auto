@@ -70,10 +70,14 @@ class AccountReport:
 
 
 def _classify(label: str) -> str:
-    if any(k in label for k in _WIN_KW):
-        return "win"
+    # LOSE MUST be checked before WIN. The polite lose phrase "ご当選されませんでした"
+    # ("you were not selected") contains the substring "当選" — so a substring WIN
+    # check run first would mark a losing account as a winner and we'd hand a loser's
+    # credentials to the customer. Lose phrases are the more specific match, so they win.
     if any(k in label for k in _LOSE_KW):
         return "lose"
+    if any(k in label for k in _WIN_KW):
+        return "win"
     if any(k in label for k in _PENDING_KW):
         return "pending"
     return "unknown"

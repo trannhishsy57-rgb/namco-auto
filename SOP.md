@@ -1,7 +1,7 @@
 # Namco Parks 抽選自動化 — 实战操作手册 (SOP)
 
 > 「开抢当天照着这份做」的标准流程。任何一场新抽选，按本文从头跑到尾即可。
-> 配套脚本：`namco_prod.py`（抢票）、`namco_email.py`（结果识别）
+> 配套脚本：`namco_prod.py`（抢票）、`namco_result.py`（登录式结果识别）
 > 最后更新：2026-06-28
 
 ---
@@ -12,7 +12,7 @@
 T-1天  准备账号 + 配服务器 + 改config + 跑dry测试
 T-15分 启动 warmup 模式（自动登录全部账号 + 保活）
 T=0    脚本在开抢时刻自动同步触发，全部账号下单
-T+结果 跑 namco_email.py 提取中签账号 → 交付客户
+T+结果 跑 namco_result.py 登录查中签账号 → 交付客户
 ```
 
 ---
@@ -154,33 +154,50 @@ grep -c '"success": true' results.jsonl
 
 ---
 
-## 4. T+结果公布：中签识别
+## 4. T+结果公布：中签识别（登录式，不用邮件）
 
-> 抽选结果以邮件通知（落选通常无邮件）。结果公布时刻见票页「抽選結果」。
+> **为什么不用邮件**：落選通常不发邮件，只能登录看；登录态本来就有，比配 IMAP 省事可靠。
+> 结果公布时刻见票页「抽選結果」。
 
-### 4.1 配置邮箱 IMAP（开跑前补全）
-
-在 `config.toml` 加一段（**密码是邮箱密码，不一定等于Namco密码**）：
-
-```toml
-[email_check]
-imap_host = "imap.livee.email"   # livee.email 实测 143 端口非SSL可连
-imap_port = 143
-```
-
-### 4.2 扫描全部邮箱
+### 4.1 一条命令查全部账号
 
 ```bash
-python namco_email.py --since 2026-07-01 --output winners.json
+python namco_result.py --output winners.json
 ```
 
-输出：
-- 控制台逐账号打印 `✓ WIN / ✗ LOSE / ? UNK`
-- `winners.json` — 中签账号列表 + 注文番号
+脚本对每个账号：登录 → 打开「購入履歴」(`member_history.html`) → 读注文番号状态标签 → 判定。
+
+**状态判定（来自 `<span class="...status-icon">` 标签文字）：**
+
+| 标签 | 判定 |
+|------|------|
+| `抽選前` / `抽選中` | pending（结果未公布） |
+| `当選` | **win 中签** |
+| `落選` / `抽選対象外` | lose 落选 |
+| 其他 | unknown（人工确认） |
+
+### 4.2 输出
+
+控制台直接打印汇总 + 中签账号（含密码），并写入 `winners.json`：
+```
+当選 WIN:   N
+落選 LOSE:  M
+抽選前:     K     ← 开奖前跑会全是这个
+
+🎉 当選アカウント:
+  xxx@livee.email   EC-2105xxxx  pwd=Qwe123456
+```
+
+> 开奖前跑会显示全部「抽選前」（已实测验证）；开奖后同一命令自动识别 当選/落選。
 
 ### 4.3 交付客户
 
-从 `winners.json` 提取中签的 `email + password`，给到买票客户即可（免支付票，客户凭账号到店）。
+`winners.json` 的 `winners[]` 里每条含 `account + password + order_number`，直接交给买票客户（免支付票，凭账号到店）。
+
+```bash
+# 只看中签账号密码
+python -c "import json; [print(w['account'], w['password'], w['order_number']) for w in json.load(open('winners.json'))['winners']]"
+```
 
 ---
 
@@ -236,8 +253,8 @@ tmux attach -t namco       # 恢复
 # 抢票
 python namco_prod.py 2>&1 | tee run.log
 
-# 结果识别
-python namco_email.py --since YYYY-MM-DD --output winners.json
+# 结果识别（登录式，开奖后跑）
+python namco_result.py --output winners.json
 
 # 成功数统计
 grep -c '"success": true' results.jsonl

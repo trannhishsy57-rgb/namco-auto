@@ -194,7 +194,7 @@ pip install requests beautifulsoup4
 | `README.md` | **本文件**（项目总索引） |
 | `SOP.md` | **开抢当天实战操作手册**（带时间轴 checklist） |
 | `namco_prod.py` | 生产主脚本（异步多账号 + warmup + 时段分配 + 计时） |
-| `namco_email.py` | 抽选结果邮件扫描（IMAP → 中签账号 winners.json） |
+| `namco_result.py` | 登录式抽选结果查询（登录→購入履歴→当選/落選 → winners.json） |
 | `namco_bench.py` | 压测工具（5阶段并发/代理测试） |
 | `namco_lottery.py` | v3 同步单账号脚本（早期版，保留参考） |
 | `config.toml` | 生产配置（账号池 / 模式 / 时段权重 / 定时） |

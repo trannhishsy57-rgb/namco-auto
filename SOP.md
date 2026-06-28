@@ -131,16 +131,19 @@ python namco_prod.py 2>&1 | tee run_$(date +%Y%m%d).log
 1. 算出 `warmup_at = lottery_open - pre_login_minutes`，**自动 sleep 到该时刻**
 2. 并发登录全部账号 → 打印 `Warmup done: N/M logged in`
 3. **预暂存**：每个会话提前 GET 票详情页 + 解析加购表单 → `Staged N/M sessions ready for T=0`
-4. 每 60 秒保活 ping，倒计时显示 `Xs until open`
-5. 到 `lottery_open` 瞬间 → `🔥 FIRING N sessions simultaneously!`，**第一个动作就是抢名额的 cart POST**（登录/找票/表单都已预热完）
-6. 全部账号同步下单，逐个打印 `⚡ CART secured at T+XXXms` / `SUCCESS / Order: EC-xxxx`
+4. 每 60 秒保活 ping。**掉线自动恢复**：ping 时若某会话被弹回 `login.html`（session 掉了），自动重登 + 重新预暂存 → `⚠ N session(s) dropped — re-logging in` / `Recovered ✓`。这保证 10 分钟空等期间不会有账号悄悄失效。
+5. **开抢前刷新 token**：临近开抢（约 90s 前）对所有会话再抓一次票面/表单 → `Re-staged N/M sessions with fresh tokens`，防止 staged token 在空等期间过期（cookie 还活着但 token 失效会导致 T=0 报「画面操作の誤り」）。
+6. 到 `lottery_open` 瞬间 → `🔥 FIRING N sessions simultaneously!`，**第一个动作就是抢名额的 cart POST**（登录/找票/表单都已预热完）
+7. 全部账号同步下单，逐个打印 `⚡ CART secured at T+XXXms` / `SUCCESS / Order: EC-xxxx`
 
 > 离开 tmux：`Ctrl+B` 然后按 `D`。重新进入：`tmux attach -t namco`。
 
 ### 3.2 实时监控要点
 
+- **时段分配核对**：启动时打印 `时段分配 (SLOT DISTRIBUTION)` 表格，开抢前肉眼核对每个时段分到的账号数对不对。
+- **掉线恢复**：看到 `Recovered ✓` 是正常的（保活期间偶有掉线被自动救回）；若看到 `Recovery FAILED ... absent at fire` 说明该账号开抢时会缺席，需人工查（密码/封号/IP）。
 - **抢名额速度**：每个成功账号打印 `⚡ T=0→cart: XXXms`，这是抢热门场的命门——越接近 0 越好。
-- **限流**：日志出现 `503` 重试 → 当前并发偏高或需要代理。
+- **限流**：日志出现 `503` 重试 → 当前并发偏高或需要代理；非 race 阶段连续失败会触发 `Circuit OPEN` 自动刹车。
 - **批次完成**：最后打印 `⚡ 速度报告` 表格 + `BATCH COMPLETE` 统计。
 
 ### 3.3 结果落盘

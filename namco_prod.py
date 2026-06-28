@@ -199,6 +199,11 @@ class Metrics:
 
 METRICS = Metrics()
 
+# Shared circuit breaker, configured in main(). Consulted by the request path in
+# non-race modes (dry/checkout/cart) so a struggling target trips the breaker
+# instead of getting hammered. None until main() wires it.
+CIRCUIT: Optional["CircuitBreaker"] = None
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Module 6: ProxyPool (LRU + health)
 # ─────────────────────────────────────────────────────────────────────────────
@@ -328,6 +333,36 @@ class CircuitBreaker:
                     self._failures = 0
                     self._log.info("Circuit CLOSED")
             return result
+
+    # Lightweight check/record interface used by the request path (so the breaker
+    # is actually consulted, not dead code). race_mode skips it for max T=0 speed.
+    async def can_proceed(self) -> bool:
+        async with self._lock:
+            if self._state == _CBState.OPEN:
+                if time.time() - self._opened_at >= self._recovery:
+                    self._state = _CBState.HALF_OPEN
+                    self._log.info("Circuit HALF_OPEN (probing)")
+                    return True
+                return False
+            return True
+
+    async def record_success(self):
+        async with self._lock:
+            if self._state == _CBState.HALF_OPEN:
+                self._state = _CBState.CLOSED
+                self._log.info("Circuit CLOSED")
+            self._failures = 0
+
+    async def record_failure(self):
+        async with self._lock:
+            self._failures += 1
+            self._opened_at = time.time()
+            if self._state == _CBState.HALF_OPEN:
+                self._state = _CBState.OPEN
+                self._log.warning("Circuit re-OPEN (half-open probe failed)")
+            elif self._failures >= self._threshold:
+                self._state = _CBState.OPEN
+                self._log.warning(f"Circuit OPEN after {self._failures} failures")
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Module 2: FormParser
@@ -531,19 +566,33 @@ class ManagedSession:
         self._last_url = str(resp.url)
         return resp
 
+    def _cb_active(self) -> bool:
+        # Breaker only guards polite (non-race) phases; T=0 race must stay unthrottled.
+        return not self._race and CIRCUIT is not None
+
     async def get(self, path: str, **kw) -> httpx.Response:
         cfg = self._cfg
+        resp = None
         for attempt in range(cfg.retry_max_attempts):
+            if self._cb_active() and not await CIRCUIT.can_proceed():
+                self._log.warning(f"Circuit OPEN — refusing GET {path}")
+                raise RuntimeError("Circuit OPEN")
             try:
                 resp = await self._do_get(path, **kw)
             except (httpx.ConnectError, httpx.TimeoutException) as e:
+                if self._cb_active():
+                    await CIRCUIT.record_failure()
                 wait = cfg.retry_initial_wait * (2 ** attempt) + random.uniform(0, cfg.retry_jitter)
                 self._log.warning(f"Network error on GET {path}: {e}, retry in {wait:.1f}s")
                 METRICS.inc("http.retry.net")
                 await asyncio.sleep(min(wait, cfg.retry_max_wait))
                 continue
             if resp.status_code != 503:
+                if self._cb_active():
+                    await CIRCUIT.record_success()
                 return resp
+            if self._cb_active():
+                await CIRCUIT.record_failure()
             wait = cfg.retry_initial_wait * (2 ** attempt) + random.uniform(0, cfg.retry_jitter)
             wait = min(wait, cfg.retry_max_wait)
             self._log.warning(f"503 GET {path}, retry in {wait:.1f}s ({attempt+1}/{cfg.retry_max_attempts})")
@@ -553,17 +602,27 @@ class ManagedSession:
 
     async def post(self, path: str, data: Optional[Dict] = None, **kw) -> httpx.Response:
         cfg = self._cfg
+        resp = None
         for attempt in range(cfg.retry_max_attempts):
+            if self._cb_active() and not await CIRCUIT.can_proceed():
+                self._log.warning(f"Circuit OPEN — refusing POST {path}")
+                raise RuntimeError("Circuit OPEN")
             try:
                 resp = await self._do_post(path, data=data, **kw)
             except (httpx.ConnectError, httpx.TimeoutException) as e:
+                if self._cb_active():
+                    await CIRCUIT.record_failure()
                 wait = cfg.retry_initial_wait * (2 ** attempt) + random.uniform(0, cfg.retry_jitter)
                 self._log.warning(f"Network error on POST {path}: {e}, retry in {wait:.1f}s")
                 METRICS.inc("http.retry.net")
                 await asyncio.sleep(min(wait, cfg.retry_max_wait))
                 continue
             if resp.status_code != 503:
+                if self._cb_active():
+                    await CIRCUIT.record_success()
                 return resp
+            if self._cb_active():
+                await CIRCUIT.record_failure()
             wait = cfg.retry_initial_wait * (2 ** attempt) + random.uniform(0, cfg.retry_jitter)
             wait = min(wait, cfg.retry_max_wait)
             self._log.warning(f"503 POST {path}, retry in {wait:.1f}s ({attempt+1}/{cfg.retry_max_attempts})")
@@ -811,19 +870,28 @@ async def step_add_cart(s: ManagedSession, ticket: Dict, slot_index: int = -1,
 
     await s._delay_polite()
     resp = await s.post("/cart_index.html", data=form_data)
+    text = resp.text
 
-    # "カートに追加されました" is a success message that Ebisu renders
-    # inside the #error CSS container — check for it before check_error.
-    if "カートに追加されました" in resp.text or "カート" in resp.text:
+    # "カートに追加されました" is the explicit success message Ebisu renders
+    # inside the #error CSS container — definitive success, check it first.
+    if "カートに追加されました" in text:
         METRICS.inc("cart.ok")
         return True
 
-    soup = BeautifulSoup(resp.text, "html.parser")
+    # Explicit error must win over the loose "カート" nav-menu match below, so a
+    # real failure isn't reported as success just because the page has a cart link.
+    soup = BeautifulSoup(text, "html.parser")
     err = check_error(soup)
     if err:
         s._log.error(f"Cart error: {err}")
         METRICS.inc("cart.fail")
         return False
+
+    # No explicit success phrase and no error: a page still rendering cart context
+    # counts as success (matches prior verified behaviour, minus the error case).
+    if "カート" in text:
+        METRICS.inc("cart.ok")
+        return True
 
     try:
         j = resp.json()
@@ -1202,7 +1270,40 @@ class WarmupScheduler:
         self._cfg = cfg
         self._results_path = results_path
         self._sessions: Dict[str, ManagedSession] = {}
+        self._accounts: Dict[str, AccountConfig] = {a.email: a for a in cfg.accounts}
         self._log = logging.getLogger("namco.warmup")
+
+    # ── shared primitives (login + stage) — used by warmup, recovery, re-stage ──
+
+    async def _stage_session(self, acc: AccountConfig, s: ManagedSession) -> bool:
+        """(Re)fetch ticket page + parse cart form so the token is fresh for T=0.
+        Returns True if the session now holds a usable staged cart form."""
+        try:
+            ticket = await step_find_ticket(s, self._cfg, acc.target_store)
+            if not ticket:
+                self._log.warning(f"Stage: no ticket for {acc.email}")
+                return False
+            form = await prepare_cart_form(s, ticket, acc.slot_index)
+            if form is None:
+                self._log.warning(f"Stage: no cart form for {acc.email}")
+                return False
+            s.staged_ticket = ticket
+            s.staged_cart_data = form
+            return True
+        except Exception as e:
+            self._log.warning(f"Stage error {acc.email}: {e}")
+            return False
+
+    async def _login_and_stage(self, acc: AccountConfig) -> Optional[ManagedSession]:
+        """Fresh login + pre-stage for one account. Returns a live session (staged
+        if possible) or None if login failed. Used for keepalive recovery."""
+        s = ManagedSession(acc.proxy or "", self._cfg, acc.email)
+        await s.__aenter__()
+        if not await step_login(s, acc.email, acc.password):
+            await s.__aexit__(None, None, None)
+            return None
+        await self._stage_session(acc, s)
+        return s
 
     async def warmup_all(self) -> int:
         sem = asyncio.Semaphore(self._cfg.max_concurrent)
@@ -1233,55 +1334,112 @@ class WarmupScheduler:
     async def stage_all(self):
         """Pre-fetch ticket page + parse cart form for every live session, so the
         first action at T=0 is the competitive cart POST (no GET on the hot path)."""
-        account_map = {a.email: a for a in self._cfg.accounts}
         sem = asyncio.Semaphore(self._cfg.max_concurrent)
 
-        async def _stage_one(email: str, s: ManagedSession):
-            acc = account_map.get(email)
+        async def _one(email: str, s: ManagedSession):
+            acc = self._accounts.get(email)
             if not acc:
                 return
             async with sem:
-                try:
-                    ticket = await step_find_ticket(s, self._cfg, acc.target_store)
-                    if not ticket:
-                        self._log.warning(f"Stage: no ticket for {email}")
-                        return
-                    form = await prepare_cart_form(s, ticket, acc.slot_index)
-                    if form is None:
-                        self._log.warning(f"Stage: no cart form for {email}")
-                        return
-                    s.staged_ticket = ticket
-                    s.staged_cart_data = form
-                    self._log.info(f"Staged ✓ {email} → {ticket['name'][:30]}")
-                except Exception as e:
-                    self._log.warning(f"Stage error {email}: {e}")
+                if await self._stage_session(acc, s):
+                    self._log.info(f"Staged ✓ {email} → {s.staged_ticket['name'][:30]}")
 
         self._log.info(f"Staging {len(self._sessions)} sessions (pre-fetch ticket + form) …")
-        await asyncio.gather(*[_stage_one(e, s) for e, s in self._sessions.items()])
+        await asyncio.gather(*[_one(e, s) for e, s in self._sessions.items()])
         staged = sum(1 for s in self._sessions.values() if s.staged_cart_data is not None)
         self._log.info(f"Staged {staged}/{len(self._sessions)} sessions ready for T=0")
 
-    async def keepalive_until(self, target: datetime):
-        interval = self._cfg.keepalive_interval
+    async def restage_all(self):
+        """Refresh ticket page + cart form for all live sessions shortly before fire,
+        so the cart token is fresh at T=0 (guards against token TTL expiry during the
+        idle wait — the staged token may go stale even while the cookie stays valid)."""
+        sem = asyncio.Semaphore(self._cfg.max_concurrent)
+
+        async def _one(email: str, s: ManagedSession):
+            acc = self._accounts.get(email)
+            if not acc:
+                return
+            async with sem:
+                await self._stage_session(acc, s)
+
+        self._log.info(f"Pre-fire re-stage: refreshing cart tokens for {len(self._sessions)} sessions …")
+        await asyncio.gather(*[_one(e, s) for e, s in list(self._sessions.items())])
+        staged = sum(1 for s in self._sessions.values() if s.staged_cart_data is not None)
+        self._log.info(f"Re-staged {staged}/{len(self._sessions)} sessions with fresh tokens")
+
+    async def _ping_and_recover(self):
+        """Ping every session; any that bounced to login.html (session dropped) or
+        errored is re-logged-in and re-staged — this is what keeps all accounts truly
+        'ready' through the 10-min idle wait instead of silently dying."""
+        dead: List[str] = []
 
         async def _ping(email: str, s: ManagedSession):
             try:
-                await s.get("/")
+                resp = await s.get("/")
+                if "/login.html" in str(resp.url):
+                    dead.append(email)
             except Exception as e:
-                self._log.warning(f"Keepalive error {email}: {e}")
+                self._log.warning(f"Keepalive ping error {email}: {e}")
+                dead.append(email)
+
+        await asyncio.gather(*[_ping(e, s) for e, s in list(self._sessions.items())])
+        if dead:
+            self._log.warning(f"⚠ {len(dead)} session(s) dropped — re-logging in: {dead}")
+            await self._recover(dead)
+
+    async def _recover(self, emails: List[str]):
+        sem = asyncio.Semaphore(self._cfg.max_concurrent)
+
+        async def _one(email: str):
+            acc = self._accounts.get(email)
+            if not acc:
+                return
+            async with sem:
+                old = self._sessions.pop(email, None)
+                if old:
+                    try:
+                        await old.__aexit__(None, None, None)
+                    except Exception:
+                        pass
+                s = await self._login_and_stage(acc)
+                if s and s.staged_cart_data is not None:
+                    self._sessions[email] = s
+                    self._log.info(f"Recovered ✓ {email}")
+                elif s:
+                    self._sessions[email] = s
+                    self._log.warning(f"Recovered (login OK, stage failed) {email}")
+                else:
+                    self._log.error(f"Recovery FAILED {email} — absent at fire")
+
+        await asyncio.gather(*[_one(e) for e in emails])
+
+    async def keepalive_until(self, target: datetime):
+        interval = self._cfg.keepalive_interval
+        restaged = False
+        # Refresh all cart tokens once when we get within this many seconds of open.
+        restage_window = max(interval + 30, 90)
 
         while True:
             now = datetime.now(timezone.utc)
             remaining = (target - now).total_seconds()
             if remaining <= 2:
                 break
-            sleep_secs = min(interval, remaining - 2)
             self._log.info(
                 f"Keepalive — {len(self._sessions)} sessions alive, "
-                f"{remaining:.0f}s until open, next ping in {sleep_secs:.0f}s"
+                f"{remaining:.0f}s until open"
             )
-            await asyncio.gather(*[_ping(e, s) for e, s in self._sessions.items()])
+            await self._ping_and_recover()
+            if not restaged and remaining <= restage_window:
+                await self.restage_all()
+                restaged = True
+            sleep_secs = min(interval, remaining - 2)
             await asyncio.sleep(sleep_secs)
+
+        # Last liveness pass on the doorstep of T=0 (recover any final drop).
+        await self._ping_and_recover()
+        if not restaged:
+            # Very short pre-login window: ensure tokens are fresh at least once.
+            await self.restage_all()
 
     async def fire_all(self) -> List[Dict]:
         self._log.info(f"🔥 FIRING {len(self._sessions)} sessions simultaneously!")
@@ -1559,6 +1717,28 @@ async def run_racetest(cfg: AppConfig, log: logging.Logger, rounds: int = 3) -> 
 # Main
 # ─────────────────────────────────────────────────────────────────────────────
 
+def _log_slot_distribution(cfg: AppConfig, log: logging.Logger):
+    """Show how many accounts land in each time slot, so the operator can VERIFY the
+    distribution before firing (goal 2). slot=-1 means 'auto / first available'."""
+    from collections import Counter
+    counts = Counter(a.slot_index for a in cfg.accounts)
+    print("\n" + "=" * 52)
+    print("  时段分配 (SLOT DISTRIBUTION) — 开抢前请核对")
+    print("=" * 52)
+    for slot in sorted(counts):
+        label = "自动(第一个可用)" if slot < 0 else f"slot[{slot}]"
+        n = counts[slot]
+        bar = "█" * min(40, n)
+        print(f"    {label:<16} {n:>5} 账号  {bar}")
+    print("    " + "-" * 44)
+    print(f"    {'合计':<16} {sum(counts.values()):>5} 账号")
+    if cfg.slot_weights:
+        print(f"    权重来源: slot_weights={cfg.slot_weights}")
+    else:
+        print("    (未配置 slot_weights → 全部自动选第一个可用时段)")
+    print("=" * 52 + "\n")
+
+
 async def main():
     script_dir = Path(__file__).parent
     cfg_path = script_dir / "config.toml"
@@ -1567,12 +1747,17 @@ async def main():
     log = setup_logging(cfg.log_level)
     cfg.results_file = str(script_dir / cfg.results_file)
 
+    # Wire the shared circuit breaker (consulted by non-race request paths).
+    global CIRCUIT
+    CIRCUIT = CircuitBreaker(cfg.circuit_failure_threshold, cfg.circuit_recovery_timeout)
+
     log.info(
         f"Namco Parks Prod | accounts={len(cfg.accounts)} "
         f"mode={cfg.mode} concurrent={cfg.max_concurrent}"
     )
     if cfg.slot_weights:
         log.info(f"Slot weights: {cfg.slot_weights} (total={sum(cfg.slot_weights)} accounts per cycle)")
+    _log_slot_distribution(cfg, log)
 
     # ── Racetest mode (safe speed benchmark, no submit) ───────────────────────
     if cfg.mode == "racetest":

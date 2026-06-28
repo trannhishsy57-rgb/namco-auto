@@ -485,8 +485,18 @@ _HEADERS = {
     ),
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
     "Accept-Language": "ja,en;q=0.9",
-    "Accept-Encoding": "gzip, deflate, br",
+    # No "br": brotli isn't a dependency, and httpx can't decode br without it —
+    # a br-encoded response would raise. gzip/deflate cover everything we need.
+    "Accept-Encoding": "gzip, deflate",
 }
+
+# Prefer the C-based lxml parser (2-3× faster than the pure-Python html.parser);
+# fall back gracefully if lxml isn't installed.
+try:
+    import lxml  # noqa: F401
+    _HTML_PARSER = "lxml"
+except ImportError:
+    _HTML_PARSER = "html.parser"
 
 @dataclass
 class SessionSignals:
@@ -742,35 +752,46 @@ class TaskQueue:
     def __init__(self, db_path: str):
         self._db = db_path
         self._log = logging.getLogger("namco.queue")
+        self._conn: Optional[aiosqlite.Connection] = None
+        # Serialize claim()'s SELECT-then-UPDATE so two concurrent workers can't grab
+        # the same PENDING row (single-process fix for the non-atomic claim race).
+        self._claim_lock = asyncio.Lock()
 
     async def init(self):
-        async with aiosqlite.connect(self._db) as db:
-            await db.execute("PRAGMA journal_mode=WAL")
-            for stmt in self.DDL.split(";"):
-                stmt = stmt.strip()
-                if stmt:
-                    await db.execute(stmt)
-            await db.commit()
+        # One persistent connection reused by every method — avoids re-opening (and
+        # re-reading the -wal file) on each operation. ~1-3ms × hundreds of calls saved.
+        self._conn = await aiosqlite.connect(self._db)
+        await self._conn.execute("PRAGMA journal_mode=WAL")
+        await self._conn.execute("PRAGMA busy_timeout=5000")
+        for stmt in self.DDL.split(";"):
+            stmt = stmt.strip()
+            if stmt:
+                await self._conn.execute(stmt)
+        await self._conn.commit()
         self._log.info(f"Queue ready: {self._db}")
+
+    async def close(self):
+        if self._conn is not None:
+            await self._conn.close()
+            self._conn = None
 
     async def enqueue_accounts(self, accounts: List[AccountConfig], mode: str):
         now = _now()
-        async with aiosqlite.connect(self._db) as db:
-            for acc in accounts:
-                await db.execute(
-                    "INSERT OR IGNORE INTO tasks "
-                    "(account_id,status,proxy,target_store,mode,created_at,updated_at) "
-                    "VALUES (?,?,?,?,?,?,?)",
-                    (acc.email, "PENDING", acc.proxy, acc.target_store, mode, now, now),
-                )
-            await db.commit()
+        rows = [(acc.email, "PENDING", acc.proxy, acc.target_store, mode, now, now)
+                for acc in accounts]
+        await self._conn.executemany(
+            "INSERT OR IGNORE INTO tasks "
+            "(account_id,status,proxy,target_store,mode,created_at,updated_at) "
+            "VALUES (?,?,?,?,?,?,?)",
+            rows,
+        )
+        await self._conn.commit()
         self._log.info(f"Enqueued {len(accounts)} accounts")
 
     async def claim(self) -> Optional[Dict]:
         now = _now()
-        async with aiosqlite.connect(self._db) as db:
-            await db.execute("PRAGMA journal_mode=WAL")
-            async with db.execute(
+        async with self._claim_lock:
+            async with self._conn.execute(
                 "SELECT id,account_id,proxy,target_store,mode,retry_count "
                 "FROM tasks WHERE status='PENDING' LIMIT 1"
             ) as cur:
@@ -778,45 +799,41 @@ class TaskQueue:
             if row is None:
                 return None
             tid, acct, proxy, store, mode, retries = row
-            await db.execute(
+            await self._conn.execute(
                 "UPDATE tasks SET status='RUNNING',updated_at=? WHERE id=?",
                 (now, tid),
             )
-            await db.commit()
+            await self._conn.commit()
         return {"id": tid, "account_id": acct, "proxy": proxy,
                 "target_store": store, "mode": mode, "retry_count": retries}
 
     async def complete(self, tid: int, result: Dict):
-        async with aiosqlite.connect(self._db) as db:
-            await db.execute(
-                "UPDATE tasks SET status='COMPLETED',result=?,updated_at=? WHERE id=?",
-                (json.dumps(result, ensure_ascii=False), _now(), tid),
-            )
-            await db.commit()
+        await self._conn.execute(
+            "UPDATE tasks SET status='COMPLETED',result=?,updated_at=? WHERE id=?",
+            (json.dumps(result, ensure_ascii=False), _now(), tid),
+        )
+        await self._conn.commit()
 
     async def fail(self, tid: int, error: str, retries: int, max_retries: int):
         new_status = "PENDING" if retries < max_retries else "DEAD_LETTER"
-        async with aiosqlite.connect(self._db) as db:
-            await db.execute(
-                "UPDATE tasks SET status=?,error=?,retry_count=?,updated_at=? WHERE id=?",
-                (new_status, error, retries + 1, _now(), tid),
-            )
-            await db.commit()
+        await self._conn.execute(
+            "UPDATE tasks SET status=?,error=?,retry_count=?,updated_at=? WHERE id=?",
+            (new_status, error, retries + 1, _now(), tid),
+        )
+        await self._conn.commit()
 
     async def pending_count(self) -> int:
-        async with aiosqlite.connect(self._db) as db:
-            async with db.execute(
-                "SELECT COUNT(*) FROM tasks WHERE status IN ('PENDING','RUNNING')"
-            ) as cur:
-                row = await cur.fetchone()
-                return row[0] if row else 0
+        async with self._conn.execute(
+            "SELECT COUNT(*) FROM tasks WHERE status IN ('PENDING','RUNNING')"
+        ) as cur:
+            row = await cur.fetchone()
+            return row[0] if row else 0
 
     async def summary(self) -> Dict[str, int]:
-        async with aiosqlite.connect(self._db) as db:
-            async with db.execute(
-                "SELECT status, COUNT(*) FROM tasks GROUP BY status"
-            ) as cur:
-                return {r[0]: r[1] for r in await cur.fetchall()}
+        async with self._conn.execute(
+            "SELECT status, COUNT(*) FROM tasks GROUP BY status"
+        ) as cur:
+            return {r[0]: r[1] for r in await cur.fetchall()}
 
 def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
@@ -827,7 +844,7 @@ def _now() -> str:
 
 async def step_login(s: ManagedSession, email: str, password: str) -> bool:
     resp = await s.get("/login.html")
-    soup = BeautifulSoup(resp.text, "html.parser")
+    soup = BeautifulSoup(resp.text, _HTML_PARSER)
     hidden: Dict[str, str] = {}
     form = soup.select_one("form")
     if form:
@@ -856,7 +873,7 @@ async def step_login(s: ManagedSession, email: str, password: str) -> bool:
 async def step_find_ticket(s: ManagedSession, cfg: AppConfig, store: str) -> Optional[Dict]:
     from urllib.parse import urljoin
     resp = await s.get("/category/EL/")
-    soup = BeautifulSoup(resp.text, "html.parser")
+    soup = BeautifulSoup(resp.text, _HTML_PARSER)
 
     tickets: List[Dict] = []
     seen: set = set()
@@ -893,7 +910,7 @@ async def prepare_cart_form(s: ManagedSession, ticket: Dict, slot_index: int = -
         s._log.error(f"Ticket page {resp.status_code}")
         return None
 
-    soup = BeautifulSoup(resp.text, "html.parser")
+    soup = BeautifulSoup(resp.text, _HTML_PARSER)
     cart_form = find_cart_form(soup)
     if not cart_form:
         s._log.error("No cart form on ticket page")
@@ -928,7 +945,7 @@ async def step_add_cart(s: ManagedSession, ticket: Dict, slot_index: int = -1,
 
     # Explicit error must win over the loose "カート" nav-menu match below, so a
     # real failure isn't reported as success just because the page has a cart link.
-    soup = BeautifulSoup(text, "html.parser")
+    soup = BeautifulSoup(text, _HTML_PARSER)
     err = check_error(soup)
     if err:
         s._log.error(f"Cart error: {err}")
@@ -963,7 +980,7 @@ async def step_add_cart(s: ManagedSession, ticket: Dict, slot_index: int = -1,
 
 async def step_get_cart(s: ManagedSession, ticket_url: str) -> Optional[Dict]:
     resp = await s.get("/cart_index.html")
-    soup = BeautifulSoup(resp.text, "html.parser")
+    soup = BeautifulSoup(resp.text, _HTML_PARSER)
 
     form = soup.select_one('form[name="cartFrm"]') or soup.select_one("form")
     form_data: Dict[str, str] = _parse_form_element(form) if form else {}
@@ -978,7 +995,7 @@ async def step_get_cart(s: ManagedSession, ticket_url: str) -> Optional[Dict]:
 async def step_checkout(s: ManagedSession, cart_data: Dict) -> Optional[str]:
     await s._delay_polite()
     resp = await s.post("/cart_seisan.html", data=cart_data)
-    soup = BeautifulSoup(resp.text, "html.parser")
+    soup = BeautifulSoup(resp.text, _HTML_PARSER)
     err = check_error(soup)
     if err:
         s._log.error(f"Seisan error: {err}")
@@ -988,7 +1005,7 @@ async def step_checkout(s: ManagedSession, cart_data: Dict) -> Optional[str]:
 
 
 async def step_confirm(s: ManagedSession, seisan_html: str) -> Optional[str]:
-    soup = BeautifulSoup(seisan_html, "html.parser")
+    soup = BeautifulSoup(seisan_html, _HTML_PARSER)
     form = find_confirm_form(soup)
     if not form:
         s._log.error("No confirm form")
@@ -1000,7 +1017,7 @@ async def step_confirm(s: ManagedSession, seisan_html: str) -> Optional[str]:
 
     await s._delay_polite()
     resp = await s.post("/cart_confirm.html", data=form_data)
-    soup = BeautifulSoup(resp.text, "html.parser")
+    soup = BeautifulSoup(resp.text, _HTML_PARSER)
     err = check_error(soup)
     if err:
         s._log.error(f"Confirm error: {err}")
@@ -1010,7 +1027,7 @@ async def step_confirm(s: ManagedSession, seisan_html: str) -> Optional[str]:
 
 
 async def step_complete(s: ManagedSession, confirm_html: str) -> Optional[Dict]:
-    soup = BeautifulSoup(confirm_html, "html.parser")
+    soup = BeautifulSoup(confirm_html, _HTML_PARSER)
     token = ""
     for inp in soup.select('input[name="token"]'):
         token = inp.get("value", "")
@@ -1028,7 +1045,7 @@ async def step_complete(s: ManagedSession, confirm_html: str) -> Optional[Dict]:
     if resp.status_code != 200:
         s._log.error(f"cart_pre → {resp.status_code}")
         return None
-    err = check_error(BeautifulSoup(resp.text, "html.parser"))
+    err = check_error(BeautifulSoup(resp.text, _HTML_PARSER))
     if err:
         s._log.error(f"Pre error: {err}")
         return None
@@ -1043,7 +1060,7 @@ async def step_complete(s: ManagedSession, confirm_html: str) -> Optional[Dict]:
         s._log.info(f"ORDER COMPLETE: {order}")
         return {"order_number": order, "token": token}
 
-    err = check_error(BeautifulSoup(resp.text, "html.parser"))
+    err = check_error(BeautifulSoup(resp.text, _HTML_PARSER))
     if err:
         s._log.error(f"Complete error: {err}")
     else:
@@ -1906,7 +1923,10 @@ async def main():
     else:
         log.info("No proxies configured — running direct")
 
-    results = await run_scheduler(cfg, queue, proxy_pool)
+    try:
+        results = await run_scheduler(cfg, queue, proxy_pool)
+    finally:
+        await queue.close()
     print_summary(results, log)
     build_speed_report(results, cfg, log)
     return results

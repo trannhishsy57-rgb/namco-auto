@@ -42,6 +42,7 @@ from namco_prod import (
     step_login,
     setup_logging,
     BASE_URL,
+    _HTML_PARSER,
 )
 
 HISTORY_URL = "/member_history.html"
@@ -85,7 +86,7 @@ def _classify(label: str) -> str:
 
 def parse_history(html: str) -> List[OrderResult]:
     """从購入履歴 HTML 提取每个订单的 (注文番号, 状态, 商品名)。"""
-    soup = BeautifulSoup(html, "html.parser")
+    soup = BeautifulSoup(html, _HTML_PARSER)
     results: List[OrderResult] = []
 
     # 每个订单块包含一个 status-icon span 和一个 EC-xxxx 注文番号

@@ -130,27 +130,77 @@ python namco_prod.py 2>&1 | tee run_$(date +%Y%m%d).log
 脚本行为（全自动，无需干预）：
 1. 算出 `warmup_at = lottery_open - pre_login_minutes`，**自动 sleep 到该时刻**
 2. 并发登录全部账号 → 打印 `Warmup done: N/M logged in`
-3. 每 60 秒保活 ping，倒计时显示 `Xs until open`
-4. 到 `lottery_open` 瞬间 → `🔥 FIRING N sessions simultaneously!`
-5. 全部账号同步下单，逐个打印 `SUCCESS / Order: EC-xxxx`
+3. **预暂存**：每个会话提前 GET 票详情页 + 解析加购表单 → `Staged N/M sessions ready for T=0`
+4. 每 60 秒保活 ping，倒计时显示 `Xs until open`
+5. 到 `lottery_open` 瞬间 → `🔥 FIRING N sessions simultaneously!`，**第一个动作就是抢名额的 cart POST**（登录/找票/表单都已预热完）
+6. 全部账号同步下单，逐个打印 `⚡ CART secured at T+XXXms` / `SUCCESS / Order: EC-xxxx`
 
 > 离开 tmux：`Ctrl+B` 然后按 `D`。重新进入：`tmux attach -t namco`。
 
 ### 3.2 实时监控要点
 
-- **速度**：每条 `SUCCESS` 行带 `Timing: login=.. cart=.. total=..ms`。热门场票1~2秒抢光，重点看 `cart` 和 `seisan` 耗时。
+- **抢名额速度**：每个成功账号打印 `⚡ T=0→cart: XXXms`，这是抢热门场的命门——越接近 0 越好。
 - **限流**：日志出现 `503` 重试 → 当前并发偏高或需要代理。
-- **批次完成**：最后 `BATCH COMPLETE` 给出 Success/Failed 统计。
+- **批次完成**：最后打印 `⚡ 速度报告` 表格 + `BATCH COMPLETE` 统计。
 
 ### 3.3 结果落盘
 
-- `results.jsonl` — 每账号一行，含 `order_number`、`step_ms`、`success`
+- `results.jsonl` — 每账号一行，含 `order_number`、`step_ms`、`fire_offset_ms`、`success`
+- `speed_report.json` — 聚合速度统计（p50/p95/p99）
 - `run_YYYYMMDD.log` — 完整日志
 
 快速统计成功数：
 ```bash
 grep -c '"success": true' results.jsonl
 ```
+
+---
+
+## 3X. 速度优化（核心：热门场1~2秒填满）
+
+> 同行多、竞争大，速度决定成败。本系统已做三层提速 + 全程计时，支持逐步优化。
+
+### 为什么必须预热（实测数据，Tokyo VPS 裸IP）
+
+`racetest` 测出**冷启动**到「准备好发起抢购」需要：
+
+| 步骤 | p50 | p95 | max |
+|------|-----|-----|-----|
+| 登录 | 1497ms | 1970ms | 2104ms |
+| 找票 | 1167ms | 2110ms | 2480ms |
+| 解析加购表单 | 394ms | 507ms | 548ms |
+| **就绪总耗时** | **2888ms** | **4589ms** | **5133ms** |
+
+**结论：冷启动光"准备好"就要 2.9~5.1 秒，已经超过 1~2 秒窗口。**
+所以登录+找票+表单**必须在开抢前完成**（warmup 预暂存做的就是这个），
+T=0 时第一个网络请求直接是抢名额的 cart POST。
+
+### 三层提速（已实现）
+
+1. **预暂存 (staging)**：warmup 阶段把登录、找票、表单解析全做完，开抢瞬间零准备。
+2. **race_mode**：砍掉所有自加的礼貌延迟（原来 30~70s）和限速器（原来 0.5 req/s）。`config.toml` 里 `race_mode = true`（warmup 默认开）。
+3. **统一 T=0 + 并发触发**：所有账号共享同一开抢时刻引用，`asyncio.gather` 同时发射。
+
+### 测速命令（不消耗账号额度）
+
+```bash
+# 改 config.toml: mode = "racetest"，然后：
+python namco_prod.py
+```
+只做登录→找票→解析表单（只读，**不提交**），重复3轮，输出 `racetest_report.json`。
+**用途**：换服务器/换代理/改并发后，先跑 racetest 对比就绪耗时，再决定是否上正式。
+
+### 逐步优化方向（按收益排序）
+
+| 优先级 | 手段 | 预期收益 |
+|--------|------|---------|
+| 1 | 预暂存（已做） | 把 2.9s 准备时间挪到开抢前 |
+| 2 | 服务器选址靠近东京 | 降 RTT，cart POST 更快 |
+| 3 | 调 `max_concurrent` | 太高触发503，跑 racetest 找平衡点 |
+| 4 | 加代理池分散出口IP | 防单IP限流（裸IP够用就先不加） |
+| 5 | HTTP/2 连接复用 / keepalive 预连 | 省 TLS 握手 |
+
+每次改动后看 `speed_report.json` 的 `fire_offset_ms.cart` 的 p50/p95 是否下降。
 
 ---
 
@@ -217,13 +267,13 @@ python -c "import json; [print(w['account'], w['password'], w['order_number']) f
 ## 6. 开跑前最终 Checklist
 
 ```
-□ git pull 已同步最新代码（含 Referer 修复 + 4功能）
+□ git pull 已同步最新代码（含 Referer 修复 + 速度提速 + 4功能）
 □ config.toml 账号池已录入，数量正确
 □ slot_weights 已【当面确认】，非沿用上次
 □ lottery_open 时刻正确，带 +09:00 时区
-□ mode = "warmup"
+□ mode = "warmup"  且  race_mode = true
 □ dry 测试通过：登录OK / 找到票 / slot分配正确
-□ [email_check] IMAP 已配（密码待客户提供则标注）
+□ racetest 测速跑过，就绪耗时在预期内（换服务器/代理后必跑）
 □ 在 tmux 里启动，已 rm 旧 namco_tasks.db
 □ 服务器时间与日本同步（date -u 核对）
 ```
@@ -250,6 +300,9 @@ tmux new -s namco          # 启动
 tmux attach -t namco       # 恢复
 # Ctrl+B 再 D = 离开但保持运行
 
+# 测速（mode=racetest，只读不提交，换服务器/代理后必跑）
+python namco_prod.py 2>&1 | tee racetest.log
+
 # 抢票
 python namco_prod.py 2>&1 | tee run.log
 
@@ -258,4 +311,7 @@ python namco_result.py --output winners.json
 
 # 成功数统计
 grep -c '"success": true' results.jsonl
+
+# 看抢名额速度分布（开抢后）
+python -c "import json; d=json.load(open('speed_report.json')); print(d['fire_offset_ms'])"
 ```

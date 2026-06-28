@@ -1,0 +1,17 @@
+# Runtime outputs
+namco_tasks.db
+namco_tasks.db-*
+results.jsonl
+speed_report.json
+racetest_report.json
+winners.json
+*.log
+debug_*.html
+submit_response_*.html
+namco_har_log.json
+results_summary.json
+
+# Python
+venv/
+__pycache__/
+*.pyc

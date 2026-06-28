@@ -1,13 +1,19 @@
 db_path      = "namco_tasks.db"
 log_level    = "INFO"
 results_file = "results.jsonl"
+speed_report = "speed_report.json"   # 聚合速度统计输出
 
 # ── 运行模式 ──────────────────────────────────────────────────────────────────
 # "checkout"  : 完整流程 login→find→cart→seisan→confirm→complete
 # "cart"      : 只到加购物车为止
 # "dry"       : 只登录+查票，不下单
-# "warmup"    : 提前登录所有账号，在 lottery_open 时刻同步触发抢票
+# "warmup"    : 提前登录所有账号 + 预暂存表单，在 lottery_open 时刻同步触发抢票
+# "racetest"  : 安全测速（只读，不提交），测就绪耗时，输出 racetest_report.json
 mode = "checkout"
+
+# ── 速度（抢热门场核心）───────────────────────────────────────────────────────
+# race_mode=true: 砍掉礼貌延迟(原30~70s)+限速器，每毫秒都算数。warmup/racetest 必开。
+race_mode = true
 
 # ── 预热定时（仅 mode="warmup" 时生效）───────────────────────────────────────
 lottery_open       = ""    # 开抢时刻 e.g. "2026-07-04T10:00:00+09:00"

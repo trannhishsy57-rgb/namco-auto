@@ -192,16 +192,17 @@ pip install requests beautifulsoup4
 | 文件 | 作用 |
 |------|------|
 | `README.md` | **本文件**（项目总索引） |
-| `namco_lottery.py` | 主脚本（v3 全自动下单） |
+| `SOP.md` | **开抢当天实战操作手册**（带时间轴 checklist） |
+| `namco_prod.py` | 生产主脚本（异步多账号 + warmup + 时段分配 + 计时） |
+| `namco_email.py` | 抽选结果邮件扫描（IMAP → 中签账号 winners.json） |
+| `namco_bench.py` | 压测工具（5阶段并发/代理测试） |
+| `namco_lottery.py` | v3 同步单账号脚本（早期版，保留参考） |
+| `config.toml` | 生产配置（账号池 / 模式 / 时段权重 / 定时） |
 | `CHECKOUT_FLOW.md` | 完整 API 流程文档（6 步请求详解） |
-| `ARCHITECTURE.md` | 通用自动化工程架构（7 模块 + 升级路径） |
+| `ARCHITECTURE.md` | 通用自动化工程架构（16 模块） |
 | `STATUS.md` | 进度与情况记录 |
 | `parse_har.py` | HAR 抓包分析工具 |
 | `inspect_form.py` | 表单结构分析工具 |
-| `namco_har_log.json` | 脚本生成的请求日志 |
-| `results_summary.json` | 批量申込结果 |
-| `debug_*.html` | 各步骤响应页面（存档） |
-| `submit_response_*.html` | 提交后响应页面（存档） |
 
 ---
 

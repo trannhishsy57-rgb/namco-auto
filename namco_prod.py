@@ -773,15 +773,23 @@ async def step_get_cart(s: ManagedSession, ticket_url: str) -> Optional[Dict]:
     resp = await s.get("/cart_index.html")
     soup = BeautifulSoup(resp.text, "html.parser")
 
+    # Debug: save raw cart page
+    import json as _json
+    s._log.info(f"Cart page length: {len(resp.text)}")
     form = soup.select_one('form[name="cartFrm"]') or soup.select_one("form")
+    if form:
+        s._log.info(f"Form name={form.get('name')} action={form.get('action')} method={form.get('method')}")
+    else:
+        s._log.error("No form found on cart page!")
+        # Log first 2000 chars to see what we got
+        s._log.info(f"Cart page snippet: {resp.text[:2000]}")
     form_data: Dict[str, str] = _parse_form_element(form) if form else {}
 
     if not form_data.get("CART_AMOUNT_0"):
         form_data["CART_AMOUNT_0"] = "1"
     form_data["CART_INDEX_REFERER"] = ticket_url
-    # JS sets request=seisan when "購入手続きに進む" is clicked
     form_data["request"] = "seisan"
-    s._log.debug(f"Cart form keys: {list(form_data.keys())}")
+    s._log.info(f"Cart POST data: {_json.dumps(form_data, ensure_ascii=False)}")
     return form_data
 
 

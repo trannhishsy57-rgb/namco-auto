@@ -1,0 +1,1775 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+<head>
+<title>ナムコパークス オンラインストア | NAMCO Parks</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-Script-Type" content="text/javascript" />
+<meta name="format-detection" content="telephone=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<title>ナムコパークス オンラインストア | NAMCO Parks</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" />
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200;300;400;500;600;700&display=swap" rel="stylesheet" />
+<link href="/client_info/BNAM_LBC_EC/view/userweb/lib/slick/slick.css?timestamp=1782449541732" rel="stylesheet" type="text/css" />
+<link href="/client_info/BNAM_LBC_EC/view/userweb/lib/slick/slick-theme.css?timestamp=1782449541732" rel="stylesheet" type="text/css" />
+<link href="/client_info/BNAM_LBC_EC/view/userweb/lib/mCustomScrollbar/jquery.mCustomScrollbar.min.css?timestamp=1782449541732" rel="stylesheet" type="text/css" />
+<link href="/client_info/BNAM_LBC_EC/view/userweb/css/style.css?timestamp=1782449541732" rel="stylesheet" type="text/css" />
+<link href="/client_info/BNAM_LBC_EC/view/userweb/css/style_modifier.css?timestamp=1782449541732" rel="stylesheet" type="text/css" />
+<link href="/client_info/BNAM_LBC_EC/view/userweb/favicon.ico?timestamp=1782449541732" rel="shortcut icon" />
+<script src="/client_info/BNAM_LBC_EC/view/userweb/js/ebisu_lib.latest.js?timestamp=1782449541732" type="text/javascript" charset="utf-8"></script>
+
+<script src="/client_info/BNAM_LBC_EC/view/userweb/js/ebisu.js?timestamp=1782449541732" type="text/javascript" charset="utf-8"></script>
+<script src="/client_info/BNAM_LBC_EC/view/userweb/lib/jquery-3.5.1.min.js?timestamp=1782449541732" type="text/javascript" charset="utf-8"></script>
+<script src="/client_info/BNAM_LBC_EC/view/userweb/lib/slick/slick.min.js?timestamp=1782449541732" type="text/javascript" charset="utf-8"></script>
+<script src="/client_info/BNAM_LBC_EC/view/userweb/lib/jquery.elevatezoom.js?timestamp=1782449541732" type="text/javascript" charset="utf-8"></script>
+<script src="/client_info/BNAM_LBC_EC/view/userweb/lib/mCustomScrollbar/jquery.mCustomScrollbar.min.js?timestamp=1782449541732" type="text/javascript" charset="utf-8"></script>
+<script src="/client_info/BNAM_LBC_EC/view/userweb/js/bnam_lbc_ec_item_detail.js?timestamp=1782449541732" type="text/javascript" charset="utf-8"></script>
+<script src="/client_info/BNAM_LBC_EC/view/userweb/js/common.js?timestamp=1782449541732" type="text/javascript" charset="utf-8"></script>
+<script src="/client_info/BNAM_LBC_EC/view/userweb/js/common_modifier.js?timestamp=1782449541732" type="text/javascript" charset="utf-8"></script>
+<link href="/client_info/BNAM_LBC_EC/view/userweb/images/apple-touch-icon.png?timestamp=1782449541732" rel="apple-touch-icon" sizes="180x180" />
+<link href="/client_info/BNAM_LBC_EC/view/userweb/images/android-touch-icon.png?timestamp=1782449541732" rel="icon" type="image/png" sizes="192x192" />
+
+<script src="/client_info/BNAM_LBC_EC/view/userweb/js/jquery.tile.js?timestamp=1782449541732" type="text/javascript" charset="utf-8"></script>
+<script src="/client_info/BNAM_LBC_EC/view/userweb/js/sales_campaign_banner.js?timestamp=1782449541732" type="text/javascript" charset="utf-8"></script>	
+<meta name="keywords" content="株式会社バンダイナムコアミューズメント,ナムコ,namco,アミューズメント,ゲームセンター,テーマパーク,キャラクター体験施設,キャラポップストア,キャラクターショップ,ボウリング,ゲーム機情報,景品情報,EC,プライズ,ナンジャタウン,Hugood,ハグッド" /><meta name="description" content="バンダイナムコアミューズメントのポータルサイト「ナムコパークス」の公式オンラインストアです。様々なアニメやゲームなどの人気作品コラボの店舗限定オリジナルグッズや景品ミニゲームなどのオンラインショッピングが楽しめます。" /><meta property="og:description" content="バンダイナムコアミューズメントのポータルサイト「ナムコパークス」の公式オンラインストアです。様々なアニメやゲームなどの人気作品コラボの店舗限定オリジナルグッズや景品ミニゲームなどのオンラインショッピングが楽しめます。" /><meta property="og:title" content="ナムコパークス オンラインストア | NAMCO Parks" /><meta property="og:type" content="website" /><meta property="og:url" content="https://parks2.bandainamco-am.co.jp/" /><meta property="og:site_name" content="ナムコパークスオンラインストア" /><link rel="canonical" href="https://parks2.bandainamco-am.co.jp/" /><!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-MGJT5BS');</script>
+<!-- End Google Tag Manager --><script type="text/javascript" src="//d.rcmd.jp/bandainamco-am.co.jp/item/recommend.js" charset="UTF-8" /></script><!-- Google Marchant Tag -->
+<meta name="google-site-verification" content="gKWTv4fJxbYvCzk_tjIzR6XWhG7U80eSwbUITeHNYBo" />
+<!-- End Google Marchant Tag --><!-- Treasure Data 2024/02/21 削除 --></head>
+<body><!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MGJT5BS"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+	<script type="text/javascript">
+	if (typeof Ebisu != "undefined") {
+		Ebisu.isLocal = false;
+		Ebisu.rootPath = 'https://parks2.bandainamco-am.co.jp/';
+	}
+	</script>
+	<script type="text/javascript">
+<!--
+// 
+function nextItemListSelectCategory(selectInput) {
+	document.location.href = selectInput.options[selectInput.selectedIndex].value;
+}
+//  
+var beatedFlag = false;
+function isUnbeaten() {
+	if (beatedFlag) {
+		return false;
+	}
+	beatedFlag = true;
+	return true;
+}
+// 
+function isUnbeatenSub() {
+	if (beatedFlag) {
+		return false;
+	}
+	return true;
+}
+// 
+function isConfirmed() {
+	return confirm('実行します。\nよろしいですか？');
+}
+// 
+function next(request) {
+	nextForm(null, null, null, request, null);
+}
+function nextKey(request, key) {
+	nextForm(null, null, null, request, key);
+}
+function nextFormKey(form, request, key) {
+	nextForm(form, null, null, request, key);
+}
+function nextAction(action, request) {
+	nextForm(null, null, action, request, null);
+}
+function nextForm(form, target, action, request, key) {
+	pos = -1;
+	if (request != null) {
+		pos = request.indexOf("download");
+	}
+	if (pos == -1 && action != null) {
+		pos = action.indexOf("Menu001Logout");
+	}
+	if (pos == -1) {
+		if (!isUnbeaten()) {
+			alert('前のリクエストを処理中です。しばらくお待ちください。');
+			return;
+		}
+	}
+	if (form == null) {
+		form = document.forms[0];
+	}
+	var oldTarget = form.target;
+	if (target) {
+		alert(target);
+		form.target = target;
+	}
+	var oldAction = form.action;
+	if (action != null) {
+		form.action = action;
+	}
+	if (request == null) {
+		request = '';
+	}
+	if (key != null) {
+		form.key.value = key;
+	}
+	if (form.request != null) {
+		form.request.value = request;
+	}
+
+	beforeExecuteSubmitForm();
+	
+	form.submit();
+
+	form.target = oldTarget;
+	form.action = oldAction;
+}
+
+(function() {
+	func = function() {beatedFlag = false;};
+	//
+	if(typeof window.addEventListener == 'function'){ 
+		window.addEventListener('unload', func, false);
+		window.addEventListener('pageshow', func, false);
+		return true;
+	}
+})();
+
+var beforeExecuteSubmitForm = function() {
+	// 
+};
+
+//-->
+</script>
+	<script type="text/javascript">
+<!--
+function ebisu_dateFormat(controller) {
+  var reg = /^(\d{4})\/?(\d{1,2})\/?(\d{1,2})?$/;
+  var str = ebisu_trim(controller.value);
+  if (reg.test(str)) {
+    var a = reg.exec(str);
+    controller.value = a[1] + ebisu_conv(a[2]) + ebisu_conv(a[3]);
+  }
+}
+function ebisu_conv(s) {
+  var ret = "";
+  if (s == null) {
+  } else if (s.length == 1) {
+    ret = "/0" + s;
+  } else if (s.length == 2) {
+    ret = "/" + s;
+  }
+  return ret;
+}
+function ebisu_revert(controller) {
+  var reg = /^\d{4}\/\d{2}(\/\d{2})?$/;
+  if (reg.test(controller.value)) {
+    controller.value = controller.value.replace(/\/+/g, "");
+  }
+}
+function ebisu_trim(s) {
+  return s.replace(/^\s*/, "").replace(/\s*$/, "");
+}
+function ebisu_cc(){
+  var e = event.srcElement;
+  var r = e.createTextRange();
+  r.moveStart("character", e.value.length);
+  r.collapse(true);
+  r.select();
+}
+//-->
+</script>
+	
+	<script type="text/javascript">
+<!--
+//
+function showSubWindowActionRequest(action, request, width, height) {
+	return showSubWindowActionRequestKey(action, request, null, width, height);
+}
+//
+function showSubWindowActionRequestKey(action, request, key, width, height) {
+	var pos = action.indexOf("?");
+	var requestString = "";
+	if (pos == -1) {
+		requestString = "?request=";
+	} else {
+		requestString = "&request=";
+	}
+	requestString += request;
+	if (key != null) {
+		requestString += "&key=" + key;
+	}
+	return showSubWindow(action + requestString, width, height);
+}
+//
+var ebisuSubWindow;
+function showSubWindow(url, width, height) {
+	if (ebisuSubWindow != null) {
+		ebisuSubWindow.close();
+	}
+	ebisuSubWindow = showSubWindowPrivate(url, width, height, "ebisuSubWindow");
+	if (ebisuSubWindow == null) {
+		alert('ウィンドウのポップアップがブラウザによってブロックされました。誠に恐れ入りますが、直接ボタンをクリックするか、ブラウザのポップアップブロックの設定を調整してください。');
+		return false;
+	}
+	ebisuSubWindow.focus();
+	return ebisuSubWindow;
+}
+//
+function showSubWindowPrivate(url, width, height, windowName) {
+	//
+	if (width == null) {
+		width = 750;
+	}
+	if (height == null) {
+		height = 650;
+	}
+	if (url.indexOf("http") != 0) {
+		url = "http://parks2.bandainamco-am.co.jp/" + url;
+	}
+	if (!isUnbeatenSub()) {
+		alert("前のリクエストを処理中です。しばらくお待ちください。");
+	} else {
+		return window.open(url, windowName, "width="+width+", height="+height+", toolbar=0, menubar=0, location=0, status=yes, scrollbars=yes");
+	}
+}
+
+//
+function closeAllSubwindow() {
+	if (ebisuSubWindow != null && !ebisuSubWindow.closed ) {
+		ebisuSubWindow.close();
+	}
+}
+-->
+</script>
+	<script type="text/javascript">
+<!--
+function joinDate(idName, yearName, monthName, dayName) {
+	if(yearName != null &&monthName != null && dayName != null){
+		document.getElementById(idName).value = document.getElementById(yearName).value + '/' + document.getElementById(monthName).value + '/' +document.getElementById(dayName).value
+	}
+}
+function yearFormat(yearName){
+	var value = document.getElementById(yearName).value;
+	if (!isNaN(value) && value.length == 1) value = '200' + value; if (!isNaN(value) && value.length == 2) value = '20' + value; if (!isNaN(value) && value.length == 3) value = '2' + value;
+	document.getElementById(yearName).value = value;
+}
+//-->
+</script>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+
+<!-- このテンプレートのURLは右記になります。 ドメイン/top.html -->
+<div class="container">
+
+<!-- view include -->
+
+
+<div style="display: none;">
+  <svg display="none">
+    <defs>
+      <!-- icon-machine -->
+      <symbol id="machine" viewBox="0 0 60 60">
+        <style>.cls-1{fill:none;}.cls-1,.cls-2,.cls-3{stroke-width:0px;}.cls-2{fill:#fff;}.cls-3{fill:#d61718;}</style><rect class="cls-1" width="60" height="60"></rect><rect class="cls-2" x="15.32" y="8.42" width="29.35" height="22.94"></rect><path class="cls-3" d="m43.52,9.57v20.64h-27.05V9.57h27.05m2.3-2.3H14.17v25.23h31.64V7.27h0Z"></path><path class="cls-2" d="m16.19,58.17c-1.45,0-2.62-1.17-2.62-2.61v-24.2h32.85v24.21c0,1.44-1.17,2.61-2.62,2.61h-27.61Z"></path><path class="cls-3" d="m45.27,32.51v23.06c0,.81-.66,1.46-1.47,1.46h-27.61c-.81,0-1.47-.65-1.47-1.46v-23.06h30.55m2.3-2.3H12.42v25.36c0,2.07,1.69,3.75,3.77,3.75h27.61c2.08,0,3.77-1.68,3.77-3.75v-25.36h0Z"></path><path class="cls-2" d="m13.57,8.42v-3.99c0-1.44,1.18-2.61,2.62-2.61h27.61c1.45,0,2.62,1.17,2.62,2.61v3.99H13.57Z"></path><path class="cls-3" d="m43.8,2.97c.81,0,1.47.65,1.47,1.46v2.84H14.72v-2.84c0-.81.66-1.46,1.47-1.46h27.61m0-2.3h-27.61c-2.08,0-3.77,1.68-3.77,3.75v5.14h35.15v-5.13c0-2.07-1.69-3.76-3.77-3.76h0Z"></path><path class="cls-3" d="m30,49.99c-3.77,0-6.84-3.05-6.84-6.79s3.07-6.79,6.84-6.79,6.84,3.05,6.84,6.79-3.07,6.79-6.84,6.79Zm0-10.52c-2.08,0-3.78,1.67-3.78,3.73s1.7,3.73,3.78,3.73,3.78-1.67,3.78-3.73-1.7-3.73-3.78-3.73Z"></path>
+      </symbol>
+    </defs>
+  </svg>
+</div>
+<header class="header">
+  
+  <div class="header-row1">
+    <div class="header-title">
+      <a href="https://parks2.bandainamco-am.co.jp/" class="js_namcoparks-top-link">
+        <div class="header-logo"><img src="/client_info/BNAM_LBC_EC/view/userweb/./images/logo.png?timestamp=1782449541732" alt="ナムコパークス オンラインストア" /></div>
+      </a>
+    </div>
+    <div class="header-menu">
+      <div class="header-menu-row1">
+        <div class="header-menu-member">
+          <ul class="header-menu-member-list">
+            
+            <li class="header-menu-member-list-item"><a href="https://parks2.bandainamco-am.co.jp/?request=logoff&amp;redirect_to=">ログアウト</a></li>
+            
+            <li class="header-menu-member-list-item"><a href="https://parks2.bandainamco-am.co.jp/ext/beginners.html">初めての方へ</a></li>
+            <li class="header-menu-member-list-item namco-parks"><a href="https://parks.bandainamco-am.co.jp/">ナムコパークスへ</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="header-menu-row2">
+        <ul class="header-menu-utilities-list">
+          <li class="header-menu-utilities-list-item"><a href="https://parks2.bandainamco-am.co.jp/member_mypage.html"><span class="icon icon-mypage"></span>マイページ</a></li>
+          
+          <li class="header-menu-utilities-list-item">
+            <a href="https://parks2.bandainamco-am.co.jp/ext/mypage_coupon.html">
+              <span class="icon icon-coupon"></span>クーポン
+              
+            </a>
+          </li>
+          <li class="header-menu-utilities-list-item">
+            <a href="https://parks2.bandainamco-am.co.jp/cart_index.html">
+            <span class="icon icon-cart"></span>カート
+            <span class="cart-num js_header-cart-num"></span>
+            </a>
+          </li>
+          <li class="header-menu-utilities-list-item header-menu-utilities-list-item-menu show-sp"><a href="javascript:void(0);" class="js_sp-menu-trigger"><span class="icon icon-menu"></span>メニュー</a></li>
+        </ul>
+        <div class="header-search show-pc">
+          <form action="https://parks2.bandainamco-am.co.jp/item_list.html" method="get" name="keyword_search_form"><input name="siborikomi_clear" value="1" type="hidden" />
+            <input name="keyword" id="form" value="" placeholder="キーワード検索" type="text" class="header-search-input" />
+            <button type="submit" class="header-search-btn"><span class="icon icon-search"></span></button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="header-row1.5">
+    <div class="breadcrumbs header-breadcrumbs show-sp">
+      <div class="breadcrumbs-inner">
+        <ul class="breadcrumbs-list">
+          <li class="breadcrumbs-list-item" itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb">
+            <a href="https://parks2.bandainamco-am.co.jp/" itemprop="url"><span itemprop="title">オンラインストア</span></a>
+          </li>
+          
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="header-row2">
+    <nav class="header-gnav">
+      <div class="header-gnav-title"><span class="icon icon-list"></span>カテゴリーから探す</div>
+      <ul class="header-gnav-list header-gnav-list-category">
+        <li class="header-gnav-list-item js_header-gnav-toggle">
+          <a href="javascript:void(0);"><span class="icon icon-star"></span>作品名から探す</a>
+          <div class="header-gnav-list-item-sub js_header-gnav-sub">
+            <ul class="header-gnav-list-item-sub-list">
+              <li class="header-gnav-list-item-sub-list-item"><a href="https://parks2.bandainamco-am.co.jp/category/SR00000005/">黒子のバスケ</a></li><li class="header-gnav-list-item-sub-list-item"><a href="https://parks2.bandainamco-am.co.jp/category/SR00000019/">太鼓の達人</a></li><li class="header-gnav-list-item-sub-list-item"><a href="https://parks2.bandainamco-am.co.jp/category/SR00000123/">あんさんぶるスターズ！！</a></li><li class="header-gnav-list-item-sub-list-item"><a href="https://parks2.bandainamco-am.co.jp/category/ME00002026/">A3!</a></li><li class="header-gnav-list-item-sub-list-item"><a href="https://parks2.bandainamco-am.co.jp/category/SR00000122/">機動戦士ガンダム 鉄血のオルフェンズ</a></li><li class="header-gnav-list-item-sub-list-item"><a href="https://parks2.bandainamco-am.co.jp/category/SR00000121/">機動戦士ガンダム 閃光のハサウェイ キルケーの魔女</a></li><li class="header-gnav-list-item-sub-list-item"><a href="https://parks2.bandainamco-am.co.jp/category/SR00000120/">TVアニメ「斉木楠雄のΨ難」</a></li><li class="header-gnav-list-item-sub-list-item"><a href="https://parks2.bandainamco-am.co.jp/category/SR00000119/">ブレイクマイケース</a></li><li class="header-gnav-list-item-sub-list-item"><a href="https://parks2.bandainamco-am.co.jp/category/SR00000116/">TV アニメ『進撃の巨人』</a></li>
+              
+              
+              
+              
+              
+              
+              
+              
+              
+            </ul>
+            <div class="header-gnav-list-item-sub-all">
+              <a href="https://parks2.bandainamco-am.co.jp/category/TITLE/">作品名をすべてみる</a>
+            </div>
+          </div>
+        </li>
+        <li class="header-gnav-list-item js_header-gnav-toggle">
+          <a href="javascript:void(0);"><span class="icon icon-goods"></span>グッズから探す</a>
+          <div class="header-gnav-list-item-sub js_header-gnav-sub">
+            <ul class="header-gnav-list-item-sub-list">
+              
+              
+              
+            </ul>
+            <div class="header-gnav-list-item-sub-all">
+              <a href="https://parks2.bandainamco-am.co.jp/category/GOODS/">グッズをすべてみる</a>
+            </div>
+          </div>
+        </li>
+        <li class="header-gnav-list-item js_header-gnav-toggle">
+          <a href="javascript:void(0);"><span class="icon icon-garapon"></span>景品ミニゲーム</a>
+          <div class="header-gnav-list-item-sub js_header-gnav-sub">
+            <ul class="header-gnav-list-item-sub-list">
+              
+              
+              
+            </ul>
+            <div class="header-gnav-list-item-sub-all">
+              <a href="https://parks2.bandainamco-am.co.jp/category/PRIZE/">景品ミニゲームをすべてみる</a>
+            </div>
+          </div>
+        </li>
+        <li class="header-gnav-list-item js_header-gnav-toggle">
+          <a href="javascript:void(0);"><span class="icon icon-brand"></span>ブランドから探す</a>
+          <div class="header-gnav-list-item-sub js_header-gnav-sub">
+            <ul class="header-gnav-list-item-sub-list">
+              <li class="header-gnav-list-item-sub-list-item"><a href="https://parks2.bandainamco-am.co.jp/gashapon.html">ガシャポン バンダイオフィシャルショップ</a></li>
+              <li class="header-gnav-list-item-sub-list-item"><a href="https://parks2.bandainamco-am.co.jp/category/EL/">入場チケット</a></li>
+              
+              
+            </ul>
+            <div class="header-gnav-list-item-sub-all">
+              <a href="https://parks2.bandainamco-am.co.jp/category/BRAND/">ブランドをすべてみる</a>
+            </div>
+          </div>
+        </li>
+      </ul>
+      <ul class="header-gnav-list header-gnav-list-guide">
+        <li class="header-gnav-list-item js_header-gnav-toggle">
+          <a href="javascript:void(0);"><span class="icon icon-notice"></span>ガイド・サポート</a>
+          <div class="header-gnav-list-item-sub js_header-gnav-sub">
+            <ul class="header-gnav-list-item-sub-list">
+              <li class="header-gnav-list-item-sub-list-item"><a href="https://parks2.bandainamco-am.co.jp/ext/guide.html">ご利用ガイド</a></li>
+              <li class="header-gnav-list-item-sub-list-item"><a href="https://bnam-customer.my.site.com/NamcoParks/s/" target="_blank">よくある質問・お問い合わせ</a></li>
+            </ul>
+          </div>
+        </li>
+        <li class="header-gnav-list-item js_header-gnav-toggle">
+          <a href="javascript:void(0);"><span class="icon icon-site"></span>サイト情報</a>
+          <div class="header-gnav-list-item-sub js_header-gnav-sub">
+            <ul class="header-gnav-list-item-sub-list">
+              <li class="header-gnav-list-item-sub-list-item"><a href="https://bandainamco-am.co.jp/company/" target="_blank">会社概要</a></li>
+              <li class="header-gnav-list-item-sub-list-item"><a href="https://parks2.bandainamco-am.co.jp/ext/web_accessibility.html">ウェブアクセシビリティ方針</a></li>
+              <li class="header-gnav-list-item-sub-list-item"><a href="https://parks2.bandainamco-am.co.jp/ext/kiyaku.html">利用規約</a></li>
+              <li class="header-gnav-list-item-sub-list-item"><a href="https://am.bandainamco-am.co.jp/privacy/" target="_blank">プライバシーポリシー</a></li>
+              <li class="header-gnav-list-item-sub-list-item"><a href="https://parks2.bandainamco-am.co.jp/ext/tokushou.html">特定商取引法に基づく表示</a></li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<div class="header-important-info">
+  <ul class="header-important-info-list">
+    <li class="header-important-info-list-item">
+      <a href="https://parks2.bandainamco-am.co.jp/topics_detail.html?info_id=4869">7/1(水) メンテナンスのお知らせ</a>
+    </li><li class="header-important-info-list-item">
+      <a href="https://parks2.bandainamco-am.co.jp/topics_detail.html?info_id=4840">【※5/19更新】「atone 翌月払い（コンビニ/口座振替）/後払い（コンビニ/銀行ATM）」緊急メンテナンスについて</a>
+    </li>
+    
+    
+  </ul>
+</div>
+<div class="header-overlay"></div>
+<script type="text/javascript">
+var member_data = {
+"member_id": "1349620",
+"sex": "M",
+"birth": "1996/01/27"
+}
+</script>
+
+
+<!-- // view include -->
+
+
+<!-- <span m:id='common.ADD_NARROWDOWN_SEARCH_COLUMN_JS_HERE'>文言など...</span> -->
+<div class="contents">
+  <div class="block-top">
+    <div class="block-top-mv">
+      <ul class="block-top-mv-slider js_mv-slider">
+        <li class="block-top-mv-slider-item">
+          <a href="https://parks2.bandainamco-am.co.jp/category/SR00000005/"><img src="/client_info/BNAM_LBC_EC/html/images/content_banner_images/kuroko_balloonart_midorima_attractionbanner.jpg" alt="黒子のバスケ Balloon Art Collection Ver. Midorima"></a>
+        </li><li class="block-top-mv-slider-item">
+          <a href="https://parks2.bandainamco-am.co.jp/category/SR00000019/"><img src="/client_info/BNAM_LBC_EC/html/images/content_banner_images/taikonotatsujin_eventbanner.jpg" alt="「太鼓の達人」『公式マイバチ』"></a>
+        </li><li class="block-top-mv-slider-item">
+          <a href="https://parks2.bandainamco-am.co.jp/category/ME00002026/"><img src="/client_info/BNAM_LBC_EC/html/images/content_banner_images/A3-2026_bnr.jpg" alt="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY"></a>
+        </li>
+        
+        
+      </ul>
+    </div>
+    <div class="block-top-category">
+      <ul class="block-top-category-list">
+        <li class="block-top-category-list-item" style="width: 50%; margin:10px 10px 0px;">
+          <a href="https://parks.bandainamco-am.co.jp/">
+            <span class="icon" style="font-size: 1px; margin: 0px;">
+             <img style="width:90%;" src="/client_info/BNAM_LBC_EC/infoimage/npos_front_goToNP.png" alt="NAMCO Parksイベント情報サイトへ" />
+            </span>
+          </a>
+        </li>
+        <li class="block-top-category-list-item" style="width: 50%; margin:10px 10px 0px; background-color:#ebebeb;">
+          <a href="https://parks2.bandainamco-am.co.jp/gashapon.html">
+            <span class="icon" style="font-size: 1px; margin: 0px;">
+              <img style="width:62%; padding:5px 0px;" src="/client_info/BNAM_LBC_EC/infoimage/npos_front_goToGashapon.png" alt="ガシャポンオンライン ストアトップへ" />
+            </span>
+          </a>
+        </li> 
+        <!-- パークスTOPのメニュー改修にあたりコメントアウト
+        <li class="block-top-category-list-item">
+          <a href="category/TITLE/">
+            <span class="icon icon-star-l"></span>
+            <span class="block-top-category-list-item-text-jp">作品名<br class="show-sp">から探す</span>
+            <span class="block-top-category-list-item-text-en">TITLE LIST</span>
+          </a>
+        </li>
+        <li class="block-top-category-list-item">
+          <a href="category/GOODS/">
+            <span class="icon icon-goods-l"></span>
+            <span class="block-top-category-list-item-text-jp">グッズ<br class="show-sp">から探す</span>
+            <span class="block-top-category-list-item-text-en">GOODS</span>
+          </a>
+        </li>
+        <li class="block-top-category-list-item">
+          <a href="category/PRIZE/">
+            <span class="icon icon-garapon-l"></span>
+            <span class="block-top-category-list-item-text-jp">景品<br class="show-sp">ミニゲーム</span>
+            <span class="block-top-category-list-item-text-en">MINI GAME</span>
+          </a>
+        </li>
+        <li class="block-top-category-list-item">
+          <a href="category/BRAND/">
+            <span class="icon icon-brand-l"></span>
+            <span class="block-top-category-list-item-text-jp">ブランド<br class="show-sp">から探す</span>
+            <span class="block-top-category-list-item-text-en">BRAND</span>
+          </a>
+        </li>
+        -->
+        <!-- 一時的なガシャポンアイコン導線 -->
+        <!-- <li class="block-top-category-list-item">
+          <a href="/gashapon.html">
+            <span class="icon" style="font-size: 1px;">
+             <img style="max-width:48px; min-width:32px; width:36%;" src="./images/gasha_icon_C.png">
+            </span>
+            <span class="block-top-category-list-item-text-jp">ガシャポン<br class="show-sp">を探す</span>
+            <span class="block-top-category-list-item-text-en">GASHAPON</span>
+          </a>
+        </li> -->
+        <!-- 一時的なガシャポンアイコン導線 -->
+      </ul>
+    </div>
+    <div class="block-top-new-arrival">
+      <h2 class="h2"><span class="ja">新着</span><span class="en">NEW</span></h2>
+      <div class="block-top-tabs">
+        <ul class="block-top-tabs-list">
+          <li class="block-top-tabs-list-item">
+            <a href="javascript:void(0);"><span class="icon icon-goods"></span>グッズ</a>
+          </li>
+          <li class="block-top-tabs-list-item">
+            <a href="javascript:void(0);"><span class="icon icon-garapon"></span>景品ミニゲーム</a>
+          </li>
+        </ul>
+        <div class="block-top-tab-contents">
+          <div class="block-top-tab-contents-block">
+            <div class="item-list-wrapper js_item-list-slider-wrapper">
+              <ul class="item-list js_item-list-slider">
+                <li id="ranking_no1" class="item-list-item">
+                  <div class="item-list-item-img">
+                    <a href="https://parks2.bandainamco-am.co.jp/item/2010251532012.html" title="黒子のバスケ Balloon Art Collection Ver. Midorima  コンプリートセット 緑間"><img src="/client_info/BNAM_LBC_EC/itemimage/2010251532012/KUROKO_GoodsSET_Midorima.jpg" alt="黒子のバスケ Balloon Art Collection Ver. Midorima  コンプリートセット 緑間" /></a>
+                  </div>
+                  <div class="item-list-item-info">
+                    <div class="item-list-item-icons js-item-icons">
+                      <span class="js_status-flag" style="display: none;"></span>
+                      <span class="item-list-item-icon item-icon-status js_status-icon"></span>
+                      
+                      <span class="item-list-item-icon item-icon-goods">グッズ</span>
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                    </div>
+                    <div class="item-list-item-name"><a href="https://parks2.bandainamco-am.co.jp/item/2010251532012.html" title="黒子のバスケ Balloon Art Collection Ver. Midorima  コンプリートセット 緑間">黒子のバスケ Balloon Art Collection Ver. Midorima  コンプリートセット 緑間</a></div>
+                    <div class="item-list-item-price">
+                      <div class="standard-price">
+                        <span class="price-value-label">6,000円</span><span class="price-unit-label">円</span><span class="tax-label">(税込)</span>
+                      </div>
+                    </div>
+                    
+                    
+                  </div>
+                </li><li id="ranking_no2" class="item-list-item">
+                  <div class="item-list-item-img">
+                    <a href="https://parks2.bandainamco-am.co.jp/item/BA4580700160441.html" title="【8月発送分】太鼓の達人　公式マイバチ　朱（aka）"><img src="/client_info/BNAM_LBC_EC/itemimage/BA4580700160441/TaikonoTatsujin_koushikimaibachi_aka_1.jpg" alt="【8月発送分】太鼓の達人　公式マイバチ　朱（aka）" /></a>
+                  </div>
+                  <div class="item-list-item-info">
+                    <div class="item-list-item-icons js-item-icons">
+                      <span class="js_status-flag" style="display: none;"></span>
+                      <span class="item-list-item-icon item-icon-status js_status-icon"></span>
+                      
+                      <span class="item-list-item-icon item-icon-goods">グッズ</span>
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                    </div>
+                    <div class="item-list-item-name"><a href="https://parks2.bandainamco-am.co.jp/item/BA4580700160441.html" title="【8月発送分】太鼓の達人　公式マイバチ　朱（aka）">【8月発送分】太鼓の達人　公式マイバチ　朱（aka）</a></div>
+                    <div class="item-list-item-price">
+                      <div class="standard-price">
+                        <span class="price-value-label">5,478円</span><span class="price-unit-label">円</span><span class="tax-label">(税込)</span>
+                      </div>
+                    </div>
+                    
+                    
+                  </div>
+                </li><li id="ranking_no3" class="item-list-item">
+                  <div class="item-list-item-img">
+                    <a href="https://parks2.bandainamco-am.co.jp/item/2010251158014.html" title="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY  インスタントフォト風カードコレクション　ちびキャラ（春組・夏組）"><img src="/client_info/BNAM_LBC_EC/itemimage/2010251158014/A3_instant-photo_WEB-1.jpg" alt="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY  インスタントフォト風カードコレクション　ちびキャラ（春組・夏組）" /></a>
+                  </div>
+                  <div class="item-list-item-info">
+                    <div class="item-list-item-icons js-item-icons">
+                      <span class="js_status-flag" style="display: none;"></span>
+                      <span class="item-list-item-icon item-icon-status js_status-icon"></span>
+                      
+                      <span class="item-list-item-icon item-icon-goods">グッズ</span>
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                    </div>
+                    <div class="item-list-item-name"><a href="https://parks2.bandainamco-am.co.jp/item/2010251158014.html" title="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY  インスタントフォト風カードコレクション　ちびキャラ（春組・夏組）">A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY  インスタントフォト風カードコレクション　ちびキャラ（春組・夏組）</a></div>
+                    <div class="item-list-item-price">
+                      <div class="standard-price">
+                        <span class="price-value-label">350円</span><span class="price-unit-label">円</span><span class="tax-label">(税込)</span>
+                      </div>
+                    </div>
+                    
+                    
+                  </div>
+                </li><li id="ranking_no4" class="item-list-item">
+                  <div class="item-list-item-img">
+                    <a href="https://parks2.bandainamco-am.co.jp/item/2010251159011.html" title="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY  インスタントフォト風カードコレクション　ちびキャラ（秋組・冬組）"><img src="/client_info/BNAM_LBC_EC/itemimage/2010251159011/A3_instant-photo_WEB-1.jpg" alt="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY  インスタントフォト風カードコレクション　ちびキャラ（秋組・冬組）" /></a>
+                  </div>
+                  <div class="item-list-item-info">
+                    <div class="item-list-item-icons js-item-icons">
+                      <span class="js_status-flag" style="display: none;"></span>
+                      <span class="item-list-item-icon item-icon-status js_status-icon"></span>
+                      
+                      <span class="item-list-item-icon item-icon-goods">グッズ</span>
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                    </div>
+                    <div class="item-list-item-name"><a href="https://parks2.bandainamco-am.co.jp/item/2010251159011.html" title="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY  インスタントフォト風カードコレクション　ちびキャラ（秋組・冬組）">A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY  インスタントフォト風カードコレクション　ちびキャラ（秋組・冬組）</a></div>
+                    <div class="item-list-item-price">
+                      <div class="standard-price">
+                        <span class="price-value-label">350円</span><span class="price-unit-label">円</span><span class="tax-label">(税込)</span>
+                      </div>
+                    </div>
+                    
+                    
+                  </div>
+                </li>
+                
+                
+                
+                
+                
+                
+                
+                
+                
+              </ul>
+            </div>
+            
+          </div>
+          <div class="block-top-tab-contents-block">
+            <div class="item-list-wrapper js_item-list-slider-wrapper">
+              <ul class="item-list js_item-list-slider">
+                <li id="ranking_no1" class="item-list-item">
+                  <div class="item-list-item-img">
+                    <a href="https://parks2.bandainamco-am.co.jp/item/ITEM_CL000396_01_0624.html" title="黒子のバスケ Balloon Art Collection Ver. Midorima バルーンガラポン"><img src="/client_info/BNAM_LBC_EC/itemimage/ITEM_CL000396_01_0624/kuroko_balloongarapon_attractionbanner.jpg" alt="黒子のバスケ Balloon Art Collection Ver. Midorima バルーンガラポン" /></a>
+                  </div>
+                  <div class="item-list-item-info">
+                    <div class="item-list-item-icons js-item-icons">
+                      <span class="js_status-flag" style="display: none;"></span>
+                      <span class="item-list-item-icon item-icon-status js_status-icon"></span>
+                      
+                      
+                      <span class="item-list-item-icon item-icon-prize">景品ミニゲーム</span>
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                    </div>
+                    <div class="item-list-item-name"><a href="https://parks2.bandainamco-am.co.jp/item/ITEM_CL000396_01_0624.html" title="黒子のバスケ Balloon Art Collection Ver. Midorima バルーンガラポン">黒子のバスケ Balloon Art Collection Ver. Midorima バルーンガラポン</a></div>
+                    <div class="item-list-item-price">
+                      <div class="standard-price">
+                        <span class="price-value-label">600円</span><span class="price-unit-label">円</span><span class="tax-label">(税込)</span>
+                      </div>
+                    </div>
+                    
+                    
+                  </div>
+                </li><li id="ranking_no2" class="item-list-item">
+                  <div class="item-list-item-img">
+                    <a href="https://parks2.bandainamco-am.co.jp/item/ITEM_CL000327_03_0410.html" title="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY Let's have a picnic!～Spring＆Summer～"><img src="/client_info/BNAM_LBC_EC/itemimage/ITEM_CL000327_03_0410/A3_HAPPYSTRAWBERRYPICNICDAY_attractionbanner_3.jpg" alt="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY Let's have a picnic!～Spring＆Summer～" /></a>
+                  </div>
+                  <div class="item-list-item-info">
+                    <div class="item-list-item-icons js-item-icons">
+                      <span class="js_status-flag" style="display: none;"></span>
+                      <span class="item-list-item-icon item-icon-status js_status-icon"></span>
+                      
+                      
+                      <span class="item-list-item-icon item-icon-prize">景品ミニゲーム</span>
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                    </div>
+                    <div class="item-list-item-name"><a href="https://parks2.bandainamco-am.co.jp/item/ITEM_CL000327_03_0410.html" title="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY Let's have a picnic!～Spring＆Summer～">A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY Let's have a picnic!～Spring＆Summer～</a></div>
+                    <div class="item-list-item-price">
+                      <div class="standard-price">
+                        <span class="price-value-label">700円</span><span class="price-unit-label">円</span><span class="tax-label">(税込)</span>
+                      </div>
+                    </div>
+                    
+                    
+                  </div>
+                </li>
+                
+                
+                
+                
+                
+                
+                
+                
+                
+              </ul>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="block-top-titles">
+      <h2 class="h2"><span class="ja">作品名から探す</span><span class="en">TITLE LIST</span></h2>
+      <ul class="block-top-titles-list">
+        <li class="block-top-titles-list-item">
+          <div class="block-top-titles-list-item-img">
+            <a href="https://parks2.bandainamco-am.co.jp/category/SR00000005/"><img src="/client_info/BNAM_LBC_EC/itemimage/kurobasu_logo2.jpg" alt="黒子のバスケ" /></a>
+          </div>
+          <div class="block-top-titles-list-item-text">
+            <a href="https://parks2.bandainamco-am.co.jp/category/SR00000005/">黒子のバスケ</a>
+          </div>
+        </li><li class="block-top-titles-list-item">
+          <div class="block-top-titles-list-item-img">
+            <a href="https://parks2.bandainamco-am.co.jp/category/SR00000019/"><img src="/client_info/BNAM_LBC_EC/itemimage/taikonotatsujin_logo.jpg" alt="太鼓の達人" /></a>
+          </div>
+          <div class="block-top-titles-list-item-text">
+            <a href="https://parks2.bandainamco-am.co.jp/category/SR00000019/">太鼓の達人</a>
+          </div>
+        </li><li class="block-top-titles-list-item">
+          <div class="block-top-titles-list-item-img">
+            <a href="https://parks2.bandainamco-am.co.jp/category/SR00000123/"><img src="/client_info/BNAM_LBC_EC/itemimage/enst logo.jpg" alt="あんさんぶるスターズ！！" /></a>
+          </div>
+          <div class="block-top-titles-list-item-text">
+            <a href="https://parks2.bandainamco-am.co.jp/category/SR00000123/">あんさんぶるスターズ！！</a>
+          </div>
+        </li><li class="block-top-titles-list-item">
+          <div class="block-top-titles-list-item-img">
+            <a href="https://parks2.bandainamco-am.co.jp/category/ME00002026/"><img src="/client_info/BNAM_LBC_EC/itemimage/A3_logo.jpg" alt="A3!" /></a>
+          </div>
+          <div class="block-top-titles-list-item-text">
+            <a href="https://parks2.bandainamco-am.co.jp/category/ME00002026/">A3!</a>
+          </div>
+        </li><li class="block-top-titles-list-item">
+          <div class="block-top-titles-list-item-img">
+            <a href="https://parks2.bandainamco-am.co.jp/category/SR00000122/"><img src="/client_info/BNAM_LBC_EC/itemimage/orphans_rogo.jpg" alt="機動戦士ガンダム 鉄血のオルフェンズ" /></a>
+          </div>
+          <div class="block-top-titles-list-item-text">
+            <a href="https://parks2.bandainamco-am.co.jp/category/SR00000122/">機動戦士ガンダム 鉄血のオルフェンズ</a>
+          </div>
+        </li><li class="block-top-titles-list-item">
+          <div class="block-top-titles-list-item-img">
+            <a href="https://parks2.bandainamco-am.co.jp/category/SR00000121/"><img src="/client_info/BNAM_LBC_EC/itemimage/SenkounoHathaway_rogo.jpg" alt="機動戦士ガンダム 閃光のハサウェイ キルケーの魔女" /></a>
+          </div>
+          <div class="block-top-titles-list-item-text">
+            <a href="https://parks2.bandainamco-am.co.jp/category/SR00000121/">機動戦士ガンダム 閃光のハサウェイ キルケーの魔女</a>
+          </div>
+        </li><li class="block-top-titles-list-item">
+          <div class="block-top-titles-list-item-img">
+            <a href="https://parks2.bandainamco-am.co.jp/category/SR00000120/"><img src="/client_info/BNAM_LBC_EC/itemimage/saikikusuo_logo.jpg" alt="TVアニメ「斉木楠雄のΨ難」" /></a>
+          </div>
+          <div class="block-top-titles-list-item-text">
+            <a href="https://parks2.bandainamco-am.co.jp/category/SR00000120/">TVアニメ「斉木楠雄のΨ難」</a>
+          </div>
+        </li><li class="block-top-titles-list-item">
+          <div class="block-top-titles-list-item-img">
+            <a href="https://parks2.bandainamco-am.co.jp/category/SR00000119/"><img src="/client_info/BNAM_LBC_EC/itemimage/breakmycaselogo.jpg" alt="ブレイクマイケース" /></a>
+          </div>
+          <div class="block-top-titles-list-item-text">
+            <a href="https://parks2.bandainamco-am.co.jp/category/SR00000119/">ブレイクマイケース</a>
+          </div>
+        </li><li class="block-top-titles-list-item">
+          <div class="block-top-titles-list-item-img">
+            <a href="https://parks2.bandainamco-am.co.jp/category/SR00000116/"><img src="/client_info/BNAM_LBC_EC/itemimage/attackontitan_logo.jpg.jpg" alt="TV アニメ『進撃の巨人』" /></a>
+          </div>
+          <div class="block-top-titles-list-item-text">
+            <a href="https://parks2.bandainamco-am.co.jp/category/SR00000116/">TV アニメ『進撃の巨人』</a>
+          </div>
+        </li>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+      </ul>
+      <div class="block-top-titles-more">
+        <a href="https://parks2.bandainamco-am.co.jp/category/TITLE/" class="btn btn-text btn-arrow-right">作品をもっとみる</a>
+      </div>
+    </div>
+    <div class="block-top-pickup">
+      <h2 class="h2"><span class="ja">ピックアップ</span><span class="en">PICK UP</span></h2>
+      <div class="block-top-tabs">
+        <ul class="block-top-tabs-list">
+          <li class="block-top-tabs-list-item">
+            <a href="javascript:void(0);"><span class="icon icon-goods"></span>グッズ</a>
+          </li>
+          <li class="block-top-tabs-list-item">
+            <a href="javascript:void(0);"><span class="icon icon-garapon"></span>景品ミニゲーム</a>
+          </li>
+        </ul>
+        <div class="block-top-tab-contents">
+          <div class="block-top-tab-contents-block">
+            <div class="item-list-wrapper js_item-list-slider-wrapper">
+              <ul class="item-list js_item-list-slider">
+                <li id="ranking_no1" class="item-list-item">
+                  <div class="item-list-item-img">
+                    <a href="https://parks2.bandainamco-am.co.jp/item/2010251160017.html" title="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY  インスタントフォト風カードコレクション　等身">
+                      <img src="/client_info/BNAM_LBC_EC/itemimage/2010251160017/A3_instant-photo_WEB_1.jpg" alt="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY  インスタントフォト風カードコレクション　等身" />
+                      <div class="item-list-item-rank">1</div>
+                    </a>
+                  </div>
+                  <div class="item-list-item-info">
+                    <div class="item-list-item-icons js-item-icons">
+                      <span class="js_status-flag" style="display: none;"></span>
+                      <span class="item-list-item-icon item-icon-status js_status-icon"></span>
+                      
+                      <span class="item-list-item-icon item-icon-goods">グッズ</span>
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                    </div>
+                    <div class="item-list-item-name"><a href="https://parks2.bandainamco-am.co.jp/item/2010251160017.html" title="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY  インスタントフォト風カードコレクション　等身">A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY  インスタントフォト風カードコレクション　等身</a></div>
+                    <div class="item-list-item-price">
+                      <div class="standard-price">
+                        <span class="price-value-label">350円</span><span class="price-unit-label">円</span><span class="tax-label">(税込)</span>
+                      </div>
+                    </div>
+                    
+                    
+                  </div>
+                </li><li id="ranking_no2" class="item-list-item">
+                  <div class="item-list-item-img">
+                    <a href="https://parks2.bandainamco-am.co.jp/item/2010251158014.html" title="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY  インスタントフォト風カードコレクション　ちびキャラ（春組・夏組）">
+                      <img src="/client_info/BNAM_LBC_EC/itemimage/2010251158014/A3_instant-photo_WEB-1.jpg" alt="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY  インスタントフォト風カードコレクション　ちびキャラ（春組・夏組）" />
+                      <div class="item-list-item-rank">2</div>
+                    </a>
+                  </div>
+                  <div class="item-list-item-info">
+                    <div class="item-list-item-icons js-item-icons">
+                      <span class="js_status-flag" style="display: none;"></span>
+                      <span class="item-list-item-icon item-icon-status js_status-icon"></span>
+                      
+                      <span class="item-list-item-icon item-icon-goods">グッズ</span>
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                    </div>
+                    <div class="item-list-item-name"><a href="https://parks2.bandainamco-am.co.jp/item/2010251158014.html" title="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY  インスタントフォト風カードコレクション　ちびキャラ（春組・夏組）">A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY  インスタントフォト風カードコレクション　ちびキャラ（春組・夏組）</a></div>
+                    <div class="item-list-item-price">
+                      <div class="standard-price">
+                        <span class="price-value-label">350円</span><span class="price-unit-label">円</span><span class="tax-label">(税込)</span>
+                      </div>
+                    </div>
+                    
+                    
+                  </div>
+                </li><li id="ranking_no3" class="item-list-item">
+                  <div class="item-list-item-img">
+                    <a href="https://parks2.bandainamco-am.co.jp/item/2010251159011.html" title="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY  インスタントフォト風カードコレクション　ちびキャラ（秋組・冬組）">
+                      <img src="/client_info/BNAM_LBC_EC/itemimage/2010251159011/A3_instant-photo_WEB-1.jpg" alt="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY  インスタントフォト風カードコレクション　ちびキャラ（秋組・冬組）" />
+                      <div class="item-list-item-rank">3</div>
+                    </a>
+                  </div>
+                  <div class="item-list-item-info">
+                    <div class="item-list-item-icons js-item-icons">
+                      <span class="js_status-flag" style="display: none;"></span>
+                      <span class="item-list-item-icon item-icon-status js_status-icon"></span>
+                      
+                      <span class="item-list-item-icon item-icon-goods">グッズ</span>
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                    </div>
+                    <div class="item-list-item-name"><a href="https://parks2.bandainamco-am.co.jp/item/2010251159011.html" title="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY  インスタントフォト風カードコレクション　ちびキャラ（秋組・冬組）">A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY  インスタントフォト風カードコレクション　ちびキャラ（秋組・冬組）</a></div>
+                    <div class="item-list-item-price">
+                      <div class="standard-price">
+                        <span class="price-value-label">350円</span><span class="price-unit-label">円</span><span class="tax-label">(税込)</span>
+                      </div>
+                    </div>
+                    
+                    
+                  </div>
+                </li><li id="ranking_no4" class="item-list-item">
+                  <div class="item-list-item-img">
+                    <a href="https://parks2.bandainamco-am.co.jp/item/2010251153019.html" title="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY  缶バッジコレクション　ちびキャラ（春組・夏組）">
+                      <img src="/client_info/BNAM_LBC_EC/itemimage/2010251153019/A3_SDcanbadge_ss_WEB_01.jpg" alt="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY  缶バッジコレクション　ちびキャラ（春組・夏組）" />
+                      <div class="item-list-item-rank">4</div>
+                    </a>
+                  </div>
+                  <div class="item-list-item-info">
+                    <div class="item-list-item-icons js-item-icons">
+                      <span class="js_status-flag" style="display: none;"></span>
+                      <span class="item-list-item-icon item-icon-status js_status-icon"></span>
+                      
+                      <span class="item-list-item-icon item-icon-goods">グッズ</span>
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                    </div>
+                    <div class="item-list-item-name"><a href="https://parks2.bandainamco-am.co.jp/item/2010251153019.html" title="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY  缶バッジコレクション　ちびキャラ（春組・夏組）">A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY  缶バッジコレクション　ちびキャラ（春組・夏組）</a></div>
+                    <div class="item-list-item-price">
+                      <div class="standard-price">
+                        <span class="price-value-label">600円</span><span class="price-unit-label">円</span><span class="tax-label">(税込)</span>
+                      </div>
+                    </div>
+                    
+                    
+                  </div>
+                </li><li id="ranking_no5" class="item-list-item">
+                  <div class="item-list-item-img">
+                    <a href="https://parks2.bandainamco-am.co.jp/item/2010251154016.html" title="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY  缶バッジコレクション　ちびキャラ（秋組・冬組）">
+                      <img src="/client_info/BNAM_LBC_EC/itemimage/2010251154016/A3_SDcanbadge_aw_WEB_01.jpg" alt="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY  缶バッジコレクション　ちびキャラ（秋組・冬組）" />
+                      <div class="item-list-item-rank">5</div>
+                    </a>
+                  </div>
+                  <div class="item-list-item-info">
+                    <div class="item-list-item-icons js-item-icons">
+                      <span class="js_status-flag" style="display: none;"></span>
+                      <span class="item-list-item-icon item-icon-status js_status-icon"></span>
+                      
+                      <span class="item-list-item-icon item-icon-goods">グッズ</span>
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                    </div>
+                    <div class="item-list-item-name"><a href="https://parks2.bandainamco-am.co.jp/item/2010251154016.html" title="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY  缶バッジコレクション　ちびキャラ（秋組・冬組）">A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY  缶バッジコレクション　ちびキャラ（秋組・冬組）</a></div>
+                    <div class="item-list-item-price">
+                      <div class="standard-price">
+                        <span class="price-value-label">600円</span><span class="price-unit-label">円</span><span class="tax-label">(税込)</span>
+                      </div>
+                    </div>
+                    
+                    
+                  </div>
+                </li>
+                
+                
+                
+                
+                
+                
+                
+                
+                
+              </ul>
+            </div>
+            
+          </div>
+          <div class="block-top-tab-contents-block">
+            <div class="item-list-wrapper js_item-list-slider-wrapper">
+              <ul class="item-list js_item-list-slider">
+                <li id="ranking_no1" class="item-list-item">
+                  <div class="item-list-item-img">
+                    <a href="https://parks2.bandainamco-am.co.jp/item/ITEM_CL000327_02_0410.html" title="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY Let's go strawberry picking!～Autumn＆Winter～">
+                      <img src="/client_info/BNAM_LBC_EC/itemimage/ITEM_CL000327_02_0410/A3_HAPPYSTRAWBERRYPICNICDAY_attractionbanner_2.jpg" alt="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY Let's go strawberry picking!～Autumn＆Winter～" />
+                      <div class="item-list-item-rank">1</div>
+                    </a>
+                  </div>
+                  <div class="item-list-item-info">
+                    <div class="item-list-item-icons js-item-icons">
+                      <span class="js_status-flag" style="display: none;"></span>
+                      <span class="item-list-item-icon item-icon-status js_status-icon"></span>
+                      
+                      
+                      <span class="item-list-item-icon item-icon-prize">景品ミニゲーム</span>
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                    </div>
+                    <div class="item-list-item-name"><a href="https://parks2.bandainamco-am.co.jp/item/ITEM_CL000327_02_0410.html" title="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY Let's go strawberry picking!～Autumn＆Winter～">A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY Let's go strawberry picking!～Autumn＆Winter～</a></div>
+                    <div class="item-list-item-price">
+                      <div class="standard-price">
+                        <span class="price-value-label">700円</span><span class="price-unit-label">円</span><span class="tax-label">(税込)</span>
+                      </div>
+                    </div>
+                    
+                    
+                  </div>
+                </li><li id="ranking_no2" class="item-list-item">
+                  <div class="item-list-item-img">
+                    <a href="https://parks2.bandainamco-am.co.jp/item/ITEM_CL000327_01_0410.html" title="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY Let's go strawberry picking!～Spring＆Summer～">
+                      <img src="/client_info/BNAM_LBC_EC/itemimage/ITEM_CL000327_01_0410/A3_HAPPYSTRAWBERRYPICNICDAY_attractionbanner_1.jpg" alt="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY Let's go strawberry picking!～Spring＆Summer～" />
+                      <div class="item-list-item-rank">2</div>
+                    </a>
+                  </div>
+                  <div class="item-list-item-info">
+                    <div class="item-list-item-icons js-item-icons">
+                      <span class="js_status-flag" style="display: none;"></span>
+                      <span class="item-list-item-icon item-icon-status js_status-icon"></span>
+                      
+                      
+                      <span class="item-list-item-icon item-icon-prize">景品ミニゲーム</span>
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                    </div>
+                    <div class="item-list-item-name"><a href="https://parks2.bandainamco-am.co.jp/item/ITEM_CL000327_01_0410.html" title="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY Let's go strawberry picking!～Spring＆Summer～">A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY Let's go strawberry picking!～Spring＆Summer～</a></div>
+                    <div class="item-list-item-price">
+                      <div class="standard-price">
+                        <span class="price-value-label">700円</span><span class="price-unit-label">円</span><span class="tax-label">(税込)</span>
+                      </div>
+                    </div>
+                    
+                    
+                  </div>
+                </li><li id="ranking_no3" class="item-list-item">
+                  <div class="item-list-item-img">
+                    <a href="https://parks2.bandainamco-am.co.jp/item/ITEM_CL000327_04_0410.html" title="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY Let's have a picnic!～Autumn＆Winter～">
+                      <img src="/client_info/BNAM_LBC_EC/itemimage/ITEM_CL000327_04_0410/A3_HAPPYSTRAWBERRYPICNICDAY_attractionbanner_4.jpg" alt="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY Let's have a picnic!～Autumn＆Winter～" />
+                      <div class="item-list-item-rank">3</div>
+                    </a>
+                  </div>
+                  <div class="item-list-item-info">
+                    <div class="item-list-item-icons js-item-icons">
+                      <span class="js_status-flag" style="display: none;"></span>
+                      <span class="item-list-item-icon item-icon-status js_status-icon"></span>
+                      
+                      
+                      <span class="item-list-item-icon item-icon-prize">景品ミニゲーム</span>
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                    </div>
+                    <div class="item-list-item-name"><a href="https://parks2.bandainamco-am.co.jp/item/ITEM_CL000327_04_0410.html" title="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY Let's have a picnic!～Autumn＆Winter～">A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY Let's have a picnic!～Autumn＆Winter～</a></div>
+                    <div class="item-list-item-price">
+                      <div class="standard-price">
+                        <span class="price-value-label">700円</span><span class="price-unit-label">円</span><span class="tax-label">(税込)</span>
+                      </div>
+                    </div>
+                    
+                    
+                  </div>
+                </li><li id="ranking_no4" class="item-list-item">
+                  <div class="item-list-item-img">
+                    <a href="https://parks2.bandainamco-am.co.jp/item/ITEM_CL000327_03_0410.html" title="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY Let's have a picnic!～Spring＆Summer～">
+                      <img src="/client_info/BNAM_LBC_EC/itemimage/ITEM_CL000327_03_0410/A3_HAPPYSTRAWBERRYPICNICDAY_attractionbanner_3.jpg" alt="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY Let's have a picnic!～Spring＆Summer～" />
+                      <div class="item-list-item-rank">4</div>
+                    </a>
+                  </div>
+                  <div class="item-list-item-info">
+                    <div class="item-list-item-icons js-item-icons">
+                      <span class="js_status-flag" style="display: none;"></span>
+                      <span class="item-list-item-icon item-icon-status js_status-icon"></span>
+                      
+                      
+                      <span class="item-list-item-icon item-icon-prize">景品ミニゲーム</span>
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                    </div>
+                    <div class="item-list-item-name"><a href="https://parks2.bandainamco-am.co.jp/item/ITEM_CL000327_03_0410.html" title="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY Let's have a picnic!～Spring＆Summer～">A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY Let's have a picnic!～Spring＆Summer～</a></div>
+                    <div class="item-list-item-price">
+                      <div class="standard-price">
+                        <span class="price-value-label">700円</span><span class="price-unit-label">円</span><span class="tax-label">(税込)</span>
+                      </div>
+                    </div>
+                    
+                    
+                  </div>
+                </li>
+                
+                
+                
+                
+                
+                
+                
+                
+                
+              </ul>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="block-top-recommend">
+      <div class="block-top-recommend-inner">
+        <h2 class="h2"><span class="ja">おすすめ商品</span><span class="en">RECOMMEND</span></h2>
+        <div class="block-top-recommend-contents">
+          <div class="block-top-recommend-block">
+            <h3 class="block-top-recommend-h3"><span class="icon icon-goods"></span>グッズ</h3>
+            <div class="item-list-wrapper">
+              <ul class="item-list">
+                <li id="ranking_no1" class="item-list-item">
+                  <div class="item-list-item-img">
+                    <a href="https://parks2.bandainamco-am.co.jp/item/2010251532012.html" title="黒子のバスケ Balloon Art Collection Ver. Midorima  コンプリートセット 緑間">
+                      <img src="/client_info/BNAM_LBC_EC/itemimage/2010251532012/KUROKO_GoodsSET_Midorima.jpg" alt="黒子のバスケ Balloon Art Collection Ver. Midorima  コンプリートセット 緑間" />
+                    </a>
+                  </div>
+                  <div class="item-list-item-info">
+                    <div class="item-list-item-icons js-item-icons">
+                      <span class="js_status-flag" style="display: none;"></span>
+                      <span class="item-list-item-icon item-icon-status js_status-icon"></span>
+                      
+                      <span class="item-list-item-icon item-icon-goods">グッズ</span>
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                    </div>
+                    <div class="item-list-item-name"><a href="https://parks2.bandainamco-am.co.jp/item/2010251532012.html" title="黒子のバスケ Balloon Art Collection Ver. Midorima  コンプリートセット 緑間">黒子のバスケ Balloon Art Collection Ver. Midorima  コンプリートセット 緑間</a></div>
+                    <div class="item-list-item-price">
+                      <div class="standard-price">
+                        <span class="price-value-label">6,000円</span><span class="price-unit-label">円</span><span class="tax-label">(税込)</span>
+                      </div>
+                    </div>
+                    
+                    
+                  </div>
+                </li><li id="ranking_no2" class="item-list-item">
+                  <div class="item-list-item-img">
+                    <a href="https://parks2.bandainamco-am.co.jp/item/BA4580700160465.html" title="【8月発送分】太鼓の達人　公式マイバチ　山吹（yamabuki）">
+                      <img src="/client_info/BNAM_LBC_EC/itemimage/BA4580700160465/TaikonoTatsujin_koushikimaibachi_yamabuki_1.jpg" alt="【8月発送分】太鼓の達人　公式マイバチ　山吹（yamabuki）" />
+                    </a>
+                  </div>
+                  <div class="item-list-item-info">
+                    <div class="item-list-item-icons js-item-icons">
+                      <span class="js_status-flag" style="display: none;"></span>
+                      <span class="item-list-item-icon item-icon-status js_status-icon"></span>
+                      
+                      <span class="item-list-item-icon item-icon-goods">グッズ</span>
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                    </div>
+                    <div class="item-list-item-name"><a href="https://parks2.bandainamco-am.co.jp/item/BA4580700160465.html" title="【8月発送分】太鼓の達人　公式マイバチ　山吹（yamabuki）">【8月発送分】太鼓の達人　公式マイバチ　山吹（yamabuki）</a></div>
+                    <div class="item-list-item-price">
+                      <div class="standard-price">
+                        <span class="price-value-label">5,478円</span><span class="price-unit-label">円</span><span class="tax-label">(税込)</span>
+                      </div>
+                    </div>
+                    
+                    
+                  </div>
+                </li><li id="ranking_no3" class="item-list-item">
+                  <div class="item-list-item-img">
+                    <a href="https://parks2.bandainamco-am.co.jp/item/2010251153019.html" title="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY  缶バッジコレクション　ちびキャラ（春組・夏組）">
+                      <img src="/client_info/BNAM_LBC_EC/itemimage/2010251153019/A3_SDcanbadge_ss_WEB_01.jpg" alt="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY  缶バッジコレクション　ちびキャラ（春組・夏組）" />
+                    </a>
+                  </div>
+                  <div class="item-list-item-info">
+                    <div class="item-list-item-icons js-item-icons">
+                      <span class="js_status-flag" style="display: none;"></span>
+                      <span class="item-list-item-icon item-icon-status js_status-icon"></span>
+                      
+                      <span class="item-list-item-icon item-icon-goods">グッズ</span>
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                    </div>
+                    <div class="item-list-item-name"><a href="https://parks2.bandainamco-am.co.jp/item/2010251153019.html" title="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY  缶バッジコレクション　ちびキャラ（春組・夏組）">A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY  缶バッジコレクション　ちびキャラ（春組・夏組）</a></div>
+                    <div class="item-list-item-price">
+                      <div class="standard-price">
+                        <span class="price-value-label">600円</span><span class="price-unit-label">円</span><span class="tax-label">(税込)</span>
+                      </div>
+                    </div>
+                    
+                    
+                  </div>
+                </li><li id="ranking_no4" class="item-list-item">
+                  <div class="item-list-item-img">
+                    <a href="https://parks2.bandainamco-am.co.jp/item/2010251154016.html" title="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY  缶バッジコレクション　ちびキャラ（秋組・冬組）">
+                      <img src="/client_info/BNAM_LBC_EC/itemimage/2010251154016/A3_SDcanbadge_aw_WEB_01.jpg" alt="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY  缶バッジコレクション　ちびキャラ（秋組・冬組）" />
+                    </a>
+                  </div>
+                  <div class="item-list-item-info">
+                    <div class="item-list-item-icons js-item-icons">
+                      <span class="js_status-flag" style="display: none;"></span>
+                      <span class="item-list-item-icon item-icon-status js_status-icon"></span>
+                      
+                      <span class="item-list-item-icon item-icon-goods">グッズ</span>
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                    </div>
+                    <div class="item-list-item-name"><a href="https://parks2.bandainamco-am.co.jp/item/2010251154016.html" title="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY  缶バッジコレクション　ちびキャラ（秋組・冬組）">A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY  缶バッジコレクション　ちびキャラ（秋組・冬組）</a></div>
+                    <div class="item-list-item-price">
+                      <div class="standard-price">
+                        <span class="price-value-label">600円</span><span class="price-unit-label">円</span><span class="tax-label">(税込)</span>
+                      </div>
+                    </div>
+                    
+                    
+                  </div>
+                </li>
+                
+                                                                
+              </ul>
+            </div>
+          </div>
+          <div class="block-top-recommend-block">
+            <h3 class="block-top-recommend-h3"><span class="icon icon-garapon"></span>景品ミニゲーム</h3>
+            <div class="item-list-wrapper">
+                <ul class="item-list">
+                  <li id="ranking_no1" class="item-list-item">
+                    <div class="item-list-item-img">
+                      <a href="https://parks2.bandainamco-am.co.jp/item/ITEM_CL000396_01_0624.html" title="黒子のバスケ Balloon Art Collection Ver. Midorima バルーンガラポン">
+                        <img src="/client_info/BNAM_LBC_EC/itemimage/ITEM_CL000396_01_0624/kuroko_balloongarapon_attractionbanner.jpg" alt="黒子のバスケ Balloon Art Collection Ver. Midorima バルーンガラポン" />
+                      </a>
+                    </div>
+                    <div class="item-list-item-info">
+                      <div class="item-list-item-icons js-item-icons">
+                        <span class="js_status-flag" style="display: none;"></span>
+                        <span class="item-list-item-icon item-icon-status js_status-icon"></span>
+                        
+                        
+                        <span class="item-list-item-icon item-icon-prize">景品ミニゲーム</span>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                      </div>
+                      <div class="item-list-item-name"><a href="https://parks2.bandainamco-am.co.jp/item/ITEM_CL000396_01_0624.html" title="黒子のバスケ Balloon Art Collection Ver. Midorima バルーンガラポン">黒子のバスケ Balloon Art Collection Ver. Midorima バルーンガラポン</a></div>
+                         <div class="item-list-item-price">
+                       <div class="standard-price">
+                          <span class="price-value-label">600円</span><span class="price-unit-label">円</span><span class="tax-label">(税込)</span>
+                       </div>
+                      </div>
+                      
+                      
+                    </div>
+                  </li><li id="ranking_no2" class="item-list-item">
+                    <div class="item-list-item-img">
+                      <a href="https://parks2.bandainamco-am.co.jp/item/ITEM_CL000327_01_0410.html" title="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY Let's go strawberry picking!～Spring＆Summer～">
+                        <img src="/client_info/BNAM_LBC_EC/itemimage/ITEM_CL000327_01_0410/A3_HAPPYSTRAWBERRYPICNICDAY_attractionbanner_1.jpg" alt="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY Let's go strawberry picking!～Spring＆Summer～" />
+                      </a>
+                    </div>
+                    <div class="item-list-item-info">
+                      <div class="item-list-item-icons js-item-icons">
+                        <span class="js_status-flag" style="display: none;"></span>
+                        <span class="item-list-item-icon item-icon-status js_status-icon"></span>
+                        
+                        
+                        <span class="item-list-item-icon item-icon-prize">景品ミニゲーム</span>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                      </div>
+                      <div class="item-list-item-name"><a href="https://parks2.bandainamco-am.co.jp/item/ITEM_CL000327_01_0410.html" title="A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY Let's go strawberry picking!～Spring＆Summer～">A3! in NAMJATOWN HAPPY STRAWBERRY PICNIC DAY Let's go strawberry picking!～Spring＆Summer～</a></div>
+                         <div class="item-list-item-price">
+                       <div class="standard-price">
+                          <span class="price-value-label">700円</span><span class="price-unit-label">円</span><span class="tax-label">(税込)</span>
+                       </div>
+                      </div>
+                      
+                      
+                    </div>
+                  </li>
+                  
+                  
+                  
+                  
+                  
+                </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="block-top-feature">
+      <div class="block-top-feature-inner">
+        <h2 class="h2"><span class="ja">まもなく販売終了</span><span class="en">FEATURE</span></h2>
+        
+      </div>
+    </div>
+    
+
+<!-- view include -->
+
+
+<!-- <div class="block-top-about-prize">
+  <div class="block-top-about-prize-inner">
+    <h2 class="h2"><span class="ja">景品ミニゲームとは？</span></h2>
+    <div class="block-top-about-prize-content">
+      <div class="block-top-about-prize-img">
+        <img src="https://placehold.jp/580x327.png" alt="">
+      </div>
+      <div class="block-top-about-prize-info">
+        <div class="block-top-about-prize-text">
+          テキストテキストテキストテキストテキストテキストテキストテキストテキストテキストテキストテキストテキストテキストテキストテキストテキストテキストテキストテキスト
+        </div>
+        <div class="block-top-about-prize-btn">
+          <a href="" class="btn btn-main  btn-size-m">景品ミニゲームを探す</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> -->
+
+
+<!-- // view include -->
+
+
+
+
+    <div class="block-item-history">
+      <h2 class="h2"><span class="ja">最近チェックした商品</span></h2>
+      <div class="block-item-history-inner">
+        <div class="item-list-wrapper js_item-list-slider-wrapper">
+          
+        </div>
+      </div>
+    </div>
+    <div class="block-top-event-news">
+      <div class="block-top-event-news-inner">
+        <div class="block-top-event-news-block">
+          <div class="block-top-event-news-block-header">
+            <h2 class="h2"><span class="ja">新着情報</span><span class="en">What's New</span></h2>
+            <div class="block-top-event-news-block-more">
+              <a href="https://parks2.bandainamco-am.co.jp/topics_list.html?info_category=1">一覧へ</a>
+            </div>
+          </div>
+          <div class="block-top-event-news-block-contents">
+            <ul class="block-top-event-news-block-contents-list">
+              <li class="block-top-event-news-block-contents-list-item">
+                <div class="block-top-event-news-block-contents-list-item-date">
+                  2026/06/25
+                </div>
+                <div class="block-top-event-news-block-contents-list-item-text">
+                  <a href="https://parks2.bandainamco-am.co.jp/topics_detail.html?info_id=4867">【販売開始】『黒子のバスケ Balloon Art Collection Ver. Midorima』グッズ販売開始！</a>
+                </div>
+              </li><li class="block-top-event-news-block-contents-list-item">
+                <div class="block-top-event-news-block-contents-list-item-date">
+                  2026/06/24
+                </div>
+                <div class="block-top-event-news-block-contents-list-item-text">
+                  <a href="https://parks2.bandainamco-am.co.jp/topics_detail.html?info_id=4865">【販売開始】「太鼓の達人」『公式マイバチ』【8月発送分】グッズ販売開始！</a>
+                </div>
+              </li><li class="block-top-event-news-block-contents-list-item">
+                <div class="block-top-event-news-block-contents-list-item-date">
+                  2026/06/11
+                </div>
+                <div class="block-top-event-news-block-contents-list-item-text">
+                  <a href="https://parks2.bandainamco-am.co.jp/topics_detail.html?info_id=4861">【景品追加】『黒子のバスケ Balloon Art Collection Ver. Kise』景品ミニゲームに新景品登場！</a>
+                </div>
+              </li><li class="block-top-event-news-block-contents-list-item">
+                <div class="block-top-event-news-block-contents-list-item-date">
+                  2026/05/28
+                </div>
+                <div class="block-top-event-news-block-contents-list-item-text">
+                  <a href="https://parks2.bandainamco-am.co.jp/topics_detail.html?info_id=4860">【販売開始】『黒子のバスケ Balloon Art Collection Ver. Kise』グッズ販売開始！</a>
+                </div>
+              </li><li class="block-top-event-news-block-contents-list-item">
+                <div class="block-top-event-news-block-contents-list-item-date">
+                  2026/05/27
+                </div>
+                <div class="block-top-event-news-block-contents-list-item-text">
+                  <a href="https://parks2.bandainamco-am.co.jp/topics_detail.html?info_id=4858">【販売開始】「太鼓の達人」『公式マイバチ』【7月発送分】グッズ販売開始！</a>
+                </div>
+              </li>
+              
+              
+              
+              
+              
+            </ul>
+          </div>
+        </div>
+        <div class="block-top-event-news-block">
+          <div class="block-top-event-news-block-header">
+            <h2 class="h2"><span class="ja">お知らせ</span><span class="en">NEWS</span></h2>
+            <div class="block-top-event-news-block-more">
+              <a href="https://parks2.bandainamco-am.co.jp/topics_list.html?info_category=2">一覧へ</a>
+            </div>
+          </div>
+          <div class="block-top-event-news-block-contents">
+            <ul class="block-top-event-news-block-contents-list">
+              <li class="block-top-event-news-block-contents-list-item">
+                <div class="block-top-event-news-block-contents-list-item-date">
+                  2026/06/10
+                </div>
+                <div class="block-top-event-news-block-contents-list-item-text">
+                  <a href="https://parks2.bandainamco-am.co.jp/topics_detail.html?info_id=4863">サイト復旧のお知らせ</a>
+                </div>
+              </li><li class="block-top-event-news-block-contents-list-item">
+                <div class="block-top-event-news-block-contents-list-item-date">
+                  2026/03/19
+                </div>
+                <div class="block-top-event-news-block-contents-list-item-text">
+                  <a href="https://parks2.bandainamco-am.co.jp/topics_detail.html?info_id=4841">【日付変更】3/25(水)-3/27(金)メンテナンスのお知らせ</a>
+                </div>
+              </li><li class="block-top-event-news-block-contents-list-item">
+                <div class="block-top-event-news-block-contents-list-item-date">
+                  2025/12/19
+                </div>
+                <div class="block-top-event-news-block-contents-list-item-text">
+                  <a href="https://parks2.bandainamco-am.co.jp/topics_detail.html?info_id=4817">年末年始休業期間中のお問い合わせについて</a>
+                </div>
+              </li><li class="block-top-event-news-block-contents-list-item">
+                <div class="block-top-event-news-block-contents-list-item-date">
+                  2025/11/12
+                </div>
+                <div class="block-top-event-news-block-contents-list-item-text">
+                  <a href="https://parks2.bandainamco-am.co.jp/topics_detail.html?info_id=4805">11/19(水) ‐ 11/20(木)メンテナンスのお知らせ</a>
+                </div>
+              </li><li class="block-top-event-news-block-contents-list-item">
+                <div class="block-top-event-news-block-contents-list-item-date">
+                  2025/10/10
+                </div>
+                <div class="block-top-event-news-block-contents-list-item-text">
+                  <a href="https://parks2.bandainamco-am.co.jp/topics_detail.html?info_id=4800">10/15(水) ・ 10/17(金)メンテナンスのお知らせ</a>
+                </div>
+              </li>
+              
+              
+              
+              
+              
+            </ul>
+          </div>
+        </div>
+         
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+<!-- view include -->
+
+
+<footer class="footer">
+  <div class="footer-pagetop">
+    <a href="#"></a>
+  </div>
+  <div class="footer-row1">
+    <div class="footer-logo"><a href="https://parks.bandainamco-am.co.jp/"><img src="/client_info/BNAM_LBC_EC/view/userweb/./images/logo_footer.png?timestamp=1782449541732" alt="ナムコパークス" /></a></div>
+  </div>
+  <div class="footer-row2">
+    <div class="footer-menu">
+      <ul class="footer-menu-list">
+        <li class="footer-menu-list-item"><a href="https://parks2.bandainamco-am.co.jp/ext/beginners.html"><span class="icon icon-guide"></span>初めての方へ</a></li>
+        <li class="footer-menu-list-item"><a href="https://parks2.bandainamco-am.co.jp/ext/guide.html"><span class="icon icon-guide"></span>ご利用ガイド</a></li>
+        <li class="footer-menu-list-item"><a href="https://bnam-customer.my.site.com/NamcoParks/s/" target="_blank"><span class="icon icon-talk"></span>よくある質問・お問い合わせ</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-row3">
+    <div class="footer-company-info">
+      <ul class="footer-company-info-list">
+        <li class="footer-company-info-list-item"><a href="https://bandainamco-am.co.jp/company/" target="_blank">会社概要</a></li>
+        <li class="footer-company-info-list-item"><a href="https://parks2.bandainamco-am.co.jp/ext/web_accessibility.html">ウェブアクセシビリティ方針</a></li>
+        <li class="footer-company-info-list-item"><a href="https://parks2.bandainamco-am.co.jp/ext/kiyaku.html">利用規約</a></li>
+        <li class="footer-company-info-list-item"><a href="https://am.bandainamco-am.co.jp/privacy/" target="_blank">プライバシーポリシー</a></li>
+        <li class="footer-company-info-list-item"><a href="https://parks2.bandainamco-am.co.jp/ext/tokushou.html">特定商取引法に基づく表示</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+<script type="text/javascript" src="https://bandainamco-am.co.jp/am/js/commonFooter.js"></script>
+
+
+<!-- // view include -->
+
+
+</div>
+
+<!-- view include -->
+
+
+
+<!-- login -->
+<div class="sp-menu">
+  <div class="sp-menu-inner">
+    <div class="sp-menu-header">
+      
+      <div class="sp-menu-header-utilities">
+        <ul class="sp-menu-header-utilities-list">
+          <li class="sp-menu-header-utilities-list-item"><a href="https://parks2.bandainamco-am.co.jp/member_mypage.html"><span class="icon icon-mypage"></span>マイページ</a></li>
+          <li class="sp-menu-header-utilities-list-item"><a href="https://parks2.bandainamco-am.co.jp/wishlist.html"><span class="icon icon-heart"></span>お気に入り</a></li>
+          <li class="sp-menu-header-utilities-list-item"><a href="https://parks2.bandainamco-am.co.jp/cart_index.html"><span class="icon icon-cart"></span>カート</a></li>
+        </ul>
+      </div>
+      <div class="sp-menu-header-search">
+        <form action="https://parks2.bandainamco-am.co.jp/item_list.html" method="get" name="keyword_search_form"><input name="siborikomi_clear" value="1" type="hidden" />
+          <input name="keyword" id="form" value="" placeholder="キーワード検索" type="text" class="sp-menu-header-search-input" />
+          <button type="submit" class="sp-menu-header-search-btn"><span class="icon icon-search"></span></button>
+        </form>
+      </div>
+    </div>
+    <ul class="sp-menu-list">
+      <li class="sp-menu-list-item sp-menu-list-item-category js_menu-toggle is_opened">
+        <a href="javascript:void(0);"><span class="icon icon-list"></span>カテゴリーから探す</a>
+        <ul class="sp-menu-list-item-sub">
+          <li class="sp-menu-list-item-sub-item js_menu-toggle">
+            <a href="javascript:void(0);"><span class="icon icon-star"></span>作品名から探す</a>
+            <ul class="sp-menu-list-item-sub-categories">
+              <li class="sp-menu-list-item-sub-categories-item"><a href="https://parks2.bandainamco-am.co.jp/category/SR00000005/">黒子のバスケ</a></li><li class="sp-menu-list-item-sub-categories-item"><a href="https://parks2.bandainamco-am.co.jp/category/SR00000019/">太鼓の達人</a></li><li class="sp-menu-list-item-sub-categories-item"><a href="https://parks2.bandainamco-am.co.jp/category/SR00000123/">あんさんぶるスターズ！！</a></li><li class="sp-menu-list-item-sub-categories-item"><a href="https://parks2.bandainamco-am.co.jp/category/ME00002026/">A3!</a></li><li class="sp-menu-list-item-sub-categories-item"><a href="https://parks2.bandainamco-am.co.jp/category/SR00000122/">機動戦士ガンダム 鉄血のオルフェンズ</a></li><li class="sp-menu-list-item-sub-categories-item"><a href="https://parks2.bandainamco-am.co.jp/category/SR00000121/">機動戦士ガンダム 閃光のハサウェイ キルケーの魔女</a></li><li class="sp-menu-list-item-sub-categories-item"><a href="https://parks2.bandainamco-am.co.jp/category/SR00000120/">TVアニメ「斉木楠雄のΨ難」</a></li><li class="sp-menu-list-item-sub-categories-item"><a href="https://parks2.bandainamco-am.co.jp/category/SR00000119/">ブレイクマイケース</a></li><li class="sp-menu-list-item-sub-categories-item"><a href="https://parks2.bandainamco-am.co.jp/category/SR00000116/">TV アニメ『進撃の巨人』</a></li>
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              <li class="sp-menu-list-item-sub-categories-item all"><a href="https://parks2.bandainamco-am.co.jp/category/TITLE/">作品をすべてみる</a></li>
+            </ul>
+          </li>
+          <li class="sp-menu-list-item-sub-item js_menu-toggle">
+            <a href="javascript:void(0);"><span class="icon icon-goods"></span>グッズから探す</a>
+            <ul class="sp-menu-list-item-sub-categories">
+              
+              
+              
+              <li class="sp-menu-list-item-sub-categories-item all"><a href="https://parks2.bandainamco-am.co.jp/category/GOODS/">グッズをすべてみる</a></li>
+            </ul>
+          </li>
+          <li class="sp-menu-list-item-sub-item js_menu-toggle">
+            <a href="javascript:void(0);"><span class="icon icon-garapon"></span>景品ミニゲームから探す</a>
+            <ul class="sp-menu-list-item-sub-categories">
+              
+              
+              
+              <li class="sp-menu-list-item-sub-categories-item all"><a href="https://parks2.bandainamco-am.co.jp/category/PRIZE/">景品ミニゲームをすべてみる</a></li>
+            </ul>
+          </li>
+          <li class="sp-menu-list-item-sub-item js_menu-toggle">
+            <a href="javascript:void(0);"><span class="icon icon-brand"></span>ブランドから探す</a>
+            <ul class="sp-menu-list-item-sub-categories">
+              <li class="sp-menu-list-item-sub-categories-item"><a href="https://parks2.bandainamco-am.co.jp/gashapon.html">ガシャポン バンダイオフィシャルショップ</a></li>
+              <li class="sp-menu-list-item-sub-categories-item"><a href="https://parks2.bandainamco-am.co.jp/category/EL/">入場チケット</a></li>
+              
+              
+              <li class="sp-menu-list-item-sub-categories-item all"><a href="https://parks2.bandainamco-am.co.jp/category/BRAND/">ブランドをすべてみる</a></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li class="sp-menu-list-item js_menu-toggle is_opened">
+        <a href="javascript:void(0);"><span class="icon icon-notice"></span>ガイド・サポート</a>
+        <ul class="sp-menu-list-item-sub">
+          <li class="sp-menu-list-item-sub-item"><a href="https://parks2.bandainamco-am.co.jp/ext/beginners.html">初めての方へ</a></li>
+          <li class="sp-menu-list-item-sub-item"><a href="https://parks2.bandainamco-am.co.jp/ext/guide.html">ご利用ガイド</a></li>
+          <li class="sp-menu-list-item-sub-item"><a href="https://bnam-customer.my.site.com/NamcoParks/s/" target="_blank">よくある質問・お問い合わせ</a></li>
+          <li class="sp-menu-list-item-sub-item"><a href="https://parks.bandainamco-am.co.jp/">ナムコパークスへ</a></li>
+        </ul>
+      </li>
+      <li class="sp-menu-list-item js_menu-toggle is_opened">
+        <a href="javascript:void(0);"><span class="icon icon-notice"></span>サイト情報</a>
+        <ul class="sp-menu-list-item-sub">
+          <li class="sp-menu-list-item-sub-item"><a href="https://bandainamco-am.co.jp/company/" target="_blank">会社概要</a></li>
+          <li class="sp-menu-list-item-sub-item"><a href="https://parks2.bandainamco-am.co.jp/ext/web_accessibility.html">ウェブアクセシビリティ方針</a></li>
+          <li class="sp-menu-list-item-sub-item"><a href="https://parks2.bandainamco-am.co.jp/ext/kiyaku.html">利用規約</a></li>
+          <li class="sp-menu-list-item-sub-item"><a href="https://am.bandainamco-am.co.jp/privacy/" target="_blank">プライバシーポリシー</a></li>
+          <li class="sp-menu-list-item-sub-item"><a href="https://parks2.bandainamco-am.co.jp/ext/tokushou.html">特定商取引法に基づく表記</a></li>
+        </ul>
+      </li>
+    </ul>
+    <div class="sp-menu-close-bottom">
+      <a href="javascript:void(0);" class="js_sp-menu-trigger"><span class="icon icon-close"></span>閉じる</a>
+    </div>
+  </div>
+  <div class="sp-menu-close">
+    <a href="javascript:void(0);" class="js_sp-menu-trigger"><span class="icon icon-close"></span>閉じる</a>
+  </div>
+</div>
+<div class="sp-menu-overlay js_sp-menu-trigger"></div>
+
+
+
+<!-- // view include -->
+
+
+
+
+<!-- チャットボット用開始 -->
+<script>(function(){
+var w=window,d=document;
+var s="https://app.chatplus.jp/cp.js";
+d["__cp_d"]="https://app.chatplus.jp";
+d["__cp_c"]="5db0de9f_2";
+var a=d.createElement("script"), m=d.getElementsByTagName("script")[0];
+a.async=true,a.src=s,m.parentNode.insertBefore(a,m);})();</script>
+<!-- チャットボット用終了 -->
+
+
+
+
+</body>
+</html>

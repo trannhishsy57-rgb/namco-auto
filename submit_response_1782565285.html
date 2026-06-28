@@ -1,0 +1,609 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:aps="eb:AMAZON_PAYMENTS/view_amazon_payments.json" xmlns:apv2="eb:AMAZON_PAYMENTS_V2/view_amazon_payments_v2_login.json" xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+<head>
+<title>ナムコパークス オンラインストア | NAMCO Parks</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-Script-Type" content="text/javascript" />
+<meta name="format-detection" content="telephone=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<title>ナムコパークス オンラインストア | NAMCO Parks</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" />
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200;300;400;500;600;700&display=swap" rel="stylesheet" />
+<link href="/client_info/BNAM_LBC_EC/view/userweb/lib/slick/slick.css?timestamp=1782449541732" rel="stylesheet" type="text/css" />
+<link href="/client_info/BNAM_LBC_EC/view/userweb/lib/slick/slick-theme.css?timestamp=1782449541732" rel="stylesheet" type="text/css" />
+<link href="/client_info/BNAM_LBC_EC/view/userweb/lib/mCustomScrollbar/jquery.mCustomScrollbar.min.css?timestamp=1782449541732" rel="stylesheet" type="text/css" />
+<link href="/client_info/BNAM_LBC_EC/view/userweb/css/style.css?timestamp=1782449541732" rel="stylesheet" type="text/css" />
+<link href="/client_info/BNAM_LBC_EC/view/userweb/css/style_modifier.css?timestamp=1782449541732" rel="stylesheet" type="text/css" />
+<link href="/client_info/BNAM_LBC_EC/view/userweb/favicon.ico?timestamp=1782449541732" rel="shortcut icon" />
+<script src="/client_info/BNAM_LBC_EC/view/userweb/js/ebisu_lib.latest.js?timestamp=1782449541732" type="text/javascript" charset="utf-8"></script>
+
+<script src="/client_info/BNAM_LBC_EC/view/userweb/js/ebisu.js?timestamp=1782449541732" type="text/javascript" charset="utf-8"></script>
+<script src="/client_info/BNAM_LBC_EC/view/userweb/lib/jquery-3.5.1.min.js?timestamp=1782449541732" type="text/javascript" charset="utf-8"></script>
+<script src="/client_info/BNAM_LBC_EC/view/userweb/lib/slick/slick.min.js?timestamp=1782449541732" type="text/javascript" charset="utf-8"></script>
+<script src="/client_info/BNAM_LBC_EC/view/userweb/lib/jquery.elevatezoom.js?timestamp=1782449541732" type="text/javascript" charset="utf-8"></script>
+<script src="/client_info/BNAM_LBC_EC/view/userweb/lib/mCustomScrollbar/jquery.mCustomScrollbar.min.js?timestamp=1782449541732" type="text/javascript" charset="utf-8"></script>
+<script src="/client_info/BNAM_LBC_EC/view/userweb/js/bnam_lbc_ec_item_detail.js?timestamp=1782449541732" type="text/javascript" charset="utf-8"></script>
+<script src="/client_info/BNAM_LBC_EC/view/userweb/js/common.js?timestamp=1782449541732" type="text/javascript" charset="utf-8"></script>
+<script src="/client_info/BNAM_LBC_EC/view/userweb/js/common_modifier.js?timestamp=1782449541732" type="text/javascript" charset="utf-8"></script>
+<link href="/client_info/BNAM_LBC_EC/view/userweb/images/apple-touch-icon.png?timestamp=1782449541732" rel="apple-touch-icon" sizes="180x180" />
+<link href="/client_info/BNAM_LBC_EC/view/userweb/images/android-touch-icon.png?timestamp=1782449541732" rel="icon" type="image/png" sizes="192x192" />
+
+
+
+<script src="/client_info/BNAM_LBC_EC/view/userweb/js/jquery.tile.js?timestamp=1782449541732" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" charset="utf-8" src="https://static-fe.payments-amazon.com/checkout.js"></script>
+<script src="/client_info/BNAM_LBC_EC/view/userweb/js/EbisuAmazonPaymentsV2.js?timestamp=1782449541732" type="text/javascript" charset="utf-8"></script>
+<script src="/client_info/BNAM_LBC_EC/view/userweb/js/jquery.tile.js?timestamp=1782449541732" type="text/javascript" charset="utf-8"></script>
+<script src="/client_info/BNAM_LBC_EC/view/userweb/js/sales_campaign_banner.js?timestamp=1782449541732" type="text/javascript" charset="utf-8"></script>	
+<meta name="keywords" content="株式会社バンダイナムコアミューズメント,ナムコ,namco,アミューズメント,ゲームセンター,テーマパーク,キャラクター体験施設,キャラポップストア,キャラクターショップ,ボウリング,ゲーム機情報,景品情報,EC,プライズ,ナンジャタウン,Hugood,ハグッド" /><meta name="description" content="バンダイナムコアミューズメントのポータルサイト「ナムコパークス」の公式オンラインストアです。様々なアニメやゲームなどの人気作品コラボの店舗限定オリジナルグッズや景品ミニゲームなどのオンラインショッピングが楽しめます。" /><meta property="og:description" content="バンダイナムコアミューズメントのポータルサイト「ナムコパークス」の公式オンラインストアです。様々なアニメやゲームなどの人気作品コラボの店舗限定オリジナルグッズや景品ミニゲームなどのオンラインショッピングが楽しめます。" /><meta property="og:title" content="ナムコパークス オンラインストア | NAMCO Parks" /><meta property="og:type" content="article" /><meta property="og:url" content="https://parks2.bandainamco-am.co.jp/cart_index.html" /><meta property="og:site_name" content="ナムコパークスオンラインストア" /><link rel="canonical" href="https://parks2.bandainamco-am.co.jp/cart_index.html" /><!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-MGJT5BS');</script>
+<!-- End Google Tag Manager --><script type="text/javascript" src="//d.rcmd.jp/bandainamco-am.co.jp/item/recommend.js" charset="UTF-8" /></script><!-- Google Marchant Tag -->
+<meta name="google-site-verification" content="gKWTv4fJxbYvCzk_tjIzR6XWhG7U80eSwbUITeHNYBo" />
+<!-- End Google Marchant Tag --><!-- Treasure Data 2024/02/21 削除 --></head>
+<body><!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MGJT5BS"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+	<script type="text/javascript">
+	if (typeof Ebisu != "undefined") {
+		Ebisu.isLocal = false;
+		Ebisu.rootPath = 'https://parks2.bandainamco-am.co.jp/';
+	}
+	</script>
+	<script type="text/javascript">
+<!--
+// 
+function nextItemListSelectCategory(selectInput) {
+	document.location.href = selectInput.options[selectInput.selectedIndex].value;
+}
+//  
+var beatedFlag = false;
+function isUnbeaten() {
+	if (beatedFlag) {
+		return false;
+	}
+	beatedFlag = true;
+	return true;
+}
+// 
+function isUnbeatenSub() {
+	if (beatedFlag) {
+		return false;
+	}
+	return true;
+}
+// 
+function isConfirmed() {
+	return confirm('実行します。\nよろしいですか？');
+}
+// 
+function next(request) {
+	nextForm(null, null, null, request, null);
+}
+function nextKey(request, key) {
+	nextForm(null, null, null, request, key);
+}
+function nextFormKey(form, request, key) {
+	nextForm(form, null, null, request, key);
+}
+function nextAction(action, request) {
+	nextForm(null, null, action, request, null);
+}
+function nextForm(form, target, action, request, key) {
+	pos = -1;
+	if (request != null) {
+		pos = request.indexOf("download");
+	}
+	if (pos == -1 && action != null) {
+		pos = action.indexOf("Menu001Logout");
+	}
+	if (pos == -1) {
+		if (!isUnbeaten()) {
+			alert('前のリクエストを処理中です。しばらくお待ちください。');
+			return;
+		}
+	}
+	if (form == null) {
+		form = document.forms[0];
+	}
+	var oldTarget = form.target;
+	if (target) {
+		alert(target);
+		form.target = target;
+	}
+	var oldAction = form.action;
+	if (action != null) {
+		form.action = action;
+	}
+	if (request == null) {
+		request = '';
+	}
+	if (key != null) {
+		form.key.value = key;
+	}
+	if (form.request != null) {
+		form.request.value = request;
+	}
+
+	beforeExecuteSubmitForm();
+	
+	form.submit();
+
+	form.target = oldTarget;
+	form.action = oldAction;
+}
+
+(function() {
+	func = function() {beatedFlag = false;};
+	//
+	if(typeof window.addEventListener == 'function'){ 
+		window.addEventListener('unload', func, false);
+		window.addEventListener('pageshow', func, false);
+		return true;
+	}
+})();
+
+var beforeExecuteSubmitForm = function() {
+	// 
+};
+
+//-->
+</script>
+	<script type="text/javascript">
+<!--
+function ebisu_dateFormat(controller) {
+  var reg = /^(\d{4})\/?(\d{1,2})\/?(\d{1,2})?$/;
+  var str = ebisu_trim(controller.value);
+  if (reg.test(str)) {
+    var a = reg.exec(str);
+    controller.value = a[1] + ebisu_conv(a[2]) + ebisu_conv(a[3]);
+  }
+}
+function ebisu_conv(s) {
+  var ret = "";
+  if (s == null) {
+  } else if (s.length == 1) {
+    ret = "/0" + s;
+  } else if (s.length == 2) {
+    ret = "/" + s;
+  }
+  return ret;
+}
+function ebisu_revert(controller) {
+  var reg = /^\d{4}\/\d{2}(\/\d{2})?$/;
+  if (reg.test(controller.value)) {
+    controller.value = controller.value.replace(/\/+/g, "");
+  }
+}
+function ebisu_trim(s) {
+  return s.replace(/^\s*/, "").replace(/\s*$/, "");
+}
+function ebisu_cc(){
+  var e = event.srcElement;
+  var r = e.createTextRange();
+  r.moveStart("character", e.value.length);
+  r.collapse(true);
+  r.select();
+}
+//-->
+</script>
+	
+	<script type="text/javascript">
+<!--
+//
+function showSubWindowActionRequest(action, request, width, height) {
+	return showSubWindowActionRequestKey(action, request, null, width, height);
+}
+//
+function showSubWindowActionRequestKey(action, request, key, width, height) {
+	var pos = action.indexOf("?");
+	var requestString = "";
+	if (pos == -1) {
+		requestString = "?request=";
+	} else {
+		requestString = "&request=";
+	}
+	requestString += request;
+	if (key != null) {
+		requestString += "&key=" + key;
+	}
+	return showSubWindow(action + requestString, width, height);
+}
+//
+var ebisuSubWindow;
+function showSubWindow(url, width, height) {
+	if (ebisuSubWindow != null) {
+		ebisuSubWindow.close();
+	}
+	ebisuSubWindow = showSubWindowPrivate(url, width, height, "ebisuSubWindow");
+	if (ebisuSubWindow == null) {
+		alert('ウィンドウのポップアップがブラウザによってブロックされました。誠に恐れ入りますが、直接ボタンをクリックするか、ブラウザのポップアップブロックの設定を調整してください。');
+		return false;
+	}
+	ebisuSubWindow.focus();
+	return ebisuSubWindow;
+}
+//
+function showSubWindowPrivate(url, width, height, windowName) {
+	//
+	if (width == null) {
+		width = 750;
+	}
+	if (height == null) {
+		height = 650;
+	}
+	if (url.indexOf("http") != 0) {
+		url = "http://parks2.bandainamco-am.co.jp/" + url;
+	}
+	if (!isUnbeatenSub()) {
+		alert("前のリクエストを処理中です。しばらくお待ちください。");
+	} else {
+		return window.open(url, windowName, "width="+width+", height="+height+", toolbar=0, menubar=0, location=0, status=yes, scrollbars=yes");
+	}
+}
+
+//
+function closeAllSubwindow() {
+	if (ebisuSubWindow != null && !ebisuSubWindow.closed ) {
+		ebisuSubWindow.close();
+	}
+}
+-->
+</script>
+	<script type="text/javascript">
+<!--
+function joinDate(idName, yearName, monthName, dayName) {
+	if(yearName != null &&monthName != null && dayName != null){
+		document.getElementById(idName).value = document.getElementById(yearName).value + '/' + document.getElementById(monthName).value + '/' +document.getElementById(dayName).value
+	}
+}
+function yearFormat(yearName){
+	var value = document.getElementById(yearName).value;
+	if (!isNaN(value) && value.length == 1) value = '200' + value; if (!isNaN(value) && value.length == 2) value = '20' + value; if (!isNaN(value) && value.length == 3) value = '2' + value;
+	document.getElementById(yearName).value = value;
+}
+//-->
+</script>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+<script type="text/javascript">
+//<!--
+
+function putRecommendToCart(item_cd) {
+	document.cartFrm.request.value = 'insert';
+	document.cartFrm.item_cd.value = item_cd;
+	document.cartFrm.submit();
+	return false;
+}
+
+//
+function putTeikiMultiSellItemToCart(item_cd) {
+	document.cartFrm.request.value = 'insert';
+	document.cartFrm.item_cd.value = item_cd;
+	document.cartFrm.teiki_flg.value = '1';
+	document.cartFrm.submit();
+	return false;
+}
+
+function clearAndOtherSeisan(item_cd, seisan_page_id) {
+	document.cartFrm.request.value = 'clear_and_other_seisan_page';
+	document.cartFrm.item_cd.value = item_cd;
+	document.cartFrm.seisan_page_id.value = seisan_page_id;
+	document.cartFrm.submit();
+	return false;
+}
+
+-->
+</script>
+
+<!-- このテンプレートのURLは右記になります。 ドメイン/cart_index.html -->
+
+<div>
+	<div>
+		<div>
+			<!-- amazon payments v2 -->
+			<input value="A2HMB2BS5DYL0E" type="hidden" id="apv2SellerId" name="apv2SellerId" />
+			<input value="JPY" type="hidden" id="apv2LedgerCurrency" name="apv2LedgerCurrency" />
+			<input value="0" type="hidden" id="apv2IsSandBox" name="apv2IsSandBox" />
+			<input value="ja_JP" type="hidden" id="apv2CheckoutLanguage" name="apv2CheckoutLanguage" />
+			<input value="PayOnly" type="hidden" id="apv2ProductType" name="apv2ProductType" />
+			<input value="Cart" type="hidden" id="apv2Placement" name="apv2Placement" />
+			<input value="Gold" type="hidden" id="apv2ButtonColor" name="apv2ButtonColor" />
+			<input value="{&#034;webCheckoutDetails&#034;:{&#034;checkoutReviewReturnUrl&#034;:&#034;https://parks2.bandainamco-am.co.jp/ext/amazon_pay_v2_pre_login.html?AMAZON_PAYMENTS_V2:isamazon=1&#034;},&#034;storeId&#034;:&#034;amzn1.application-oa2-client.0580c73f47fc4ba28a6e009c6b865ced&#034;,&#034;chargePermissionType&#034;:&#034;OneTime&#034;,&#034;deliverySpecifications&#034;:{&#034;addressRestrictions&#034;:{&#034;type&#034;:&#034;Allowed&#034;,&#034;restrictions&#034;:{&#034;JP&#034;:{}}}},&#034;paymentDetails&#034;:{&#034;allowOvercharge&#034;:true}}" type="hidden" id="apv2Payload" name="apv2Payload" />
+			<input value="rAHOXdG4RRTGa/w7mnoZjJzaQ/HpDuRMe/M6OneHPn5OXImG+NBo3akiA740TWX7POOYg/Qd2IkqdRYiPCLIcqvZj/HJbSH2yCo7485zATbrk81RffP+T/pMRt/Y0ZTv0XIp5F/xz5NGIx2YohbnYx4dLXNFwmd6kzNTluDeTWus3Lz3r1uSwto0aImk4/R3ZKowZtAJpEn5aNyd90jpmxBq7pNDYOEGDJeJo+DtyRgqJ3Z3SW8EqUV/piBb6G94UP4gxCbESH7iMAX6Axojhc34ujIWMYeo8Rx65XUcp7cixgOc7gNSA/oQpMx6RTzGp4dPqRwLarWFck/Zq5Oh1A==" type="hidden" id="apv2Signature" name="apv2Signature" />
+			<input value="AHNCMRCROJFAENAO6S76JDM5" type="hidden" id="apv2PublicKeyId" name="apv2PublicKeyId" />
+			<input value="eyJhbGciOiJIbWFjU0hBMjU2IiwidHlwIjoiSldUIn0=.eyJhdWQiOlsiQW1hem9uUGF5Il0sImV4cCI6MTY0MjkyMDU0MTUzNiwiaWF0IjoxNjExODE2NTQxNTM2LCJpc3MiOiJBbWF6b25QYXkiLCJqdGkiOiJhbXpuLjEuMTRkNTBlZmItYTY4ZS00MDkxLThiYmQtMzc0NzYyMWQ2YTYyIiwicGlkIjoiQUZJS05aTVpDQ05BQlJSMjI0NDdXTFg3UUdBQSIsInNjb3BlcyI6WyIqIl0sInN1YiI6WyJBRkxBNjY0UzRNTjVNVU9TVkFJV1dUT0dBM0tBIl19.yRGoojCqSfWseul9aYQENhUfr-bs137FbjtkK0iBPsA=" type="hidden" id="apv2AuthToken" name="apv2AuthToken" />
+			<!-- /amazon payments v2 -->
+		</div>
+	</div>
+</div>
+
+
+
+<div class="container">
+  
+
+<!-- view include -->
+
+
+
+
+<div style="display: none;">
+  <svg display="none">
+    <defs>
+      <!-- icon-machine -->
+      <symbol id="machine" viewBox="0 0 60 60">
+        <style>.cls-1{fill:none;}.cls-1,.cls-2,.cls-3{stroke-width:0px;}.cls-2{fill:#fff;}.cls-3{fill:#d61718;}</style><rect class="cls-1" width="60" height="60"></rect><rect class="cls-2" x="15.32" y="8.42" width="29.35" height="22.94"></rect><path class="cls-3" d="m43.52,9.57v20.64h-27.05V9.57h27.05m2.3-2.3H14.17v25.23h31.64V7.27h0Z"></path><path class="cls-2" d="m16.19,58.17c-1.45,0-2.62-1.17-2.62-2.61v-24.2h32.85v24.21c0,1.44-1.17,2.61-2.62,2.61h-27.61Z"></path><path class="cls-3" d="m45.27,32.51v23.06c0,.81-.66,1.46-1.47,1.46h-27.61c-.81,0-1.47-.65-1.47-1.46v-23.06h30.55m2.3-2.3H12.42v25.36c0,2.07,1.69,3.75,3.77,3.75h27.61c2.08,0,3.77-1.68,3.77-3.75v-25.36h0Z"></path><path class="cls-2" d="m13.57,8.42v-3.99c0-1.44,1.18-2.61,2.62-2.61h27.61c1.45,0,2.62,1.17,2.62,2.61v3.99H13.57Z"></path><path class="cls-3" d="m43.8,2.97c.81,0,1.47.65,1.47,1.46v2.84H14.72v-2.84c0-.81.66-1.46,1.47-1.46h27.61m0-2.3h-27.61c-2.08,0-3.77,1.68-3.77,3.75v5.14h35.15v-5.13c0-2.07-1.69-3.76-3.77-3.76h0Z"></path><path class="cls-3" d="m30,49.99c-3.77,0-6.84-3.05-6.84-6.79s3.07-6.79,6.84-6.79,6.84,3.05,6.84,6.79-3.07,6.79-6.84,6.79Zm0-10.52c-2.08,0-3.78,1.67-3.78,3.73s1.7,3.73,3.78,3.73,3.78-1.67,3.78-3.73-1.7-3.73-3.78-3.73Z"></path>
+      </symbol>
+    </defs>
+  </svg>
+</div>
+
+<header class="header header-simple">
+  
+  <div class="header-row1">
+    <div class="header-title">
+      <a href="https://parks2.bandainamco-am.co.jp/" class="js_namcoparks-top-link">
+        <div class="header-logo"><img src="/client_info/BNAM_LBC_EC/view/userweb/./images/logo.png?timestamp=1782449541732" alt="ナムコパークス" /></div>
+      </a>
+    </div>
+  </div>
+  <script type="text/javascript">
+var member_data = {
+"member_id": "1349620",
+"sex": "M",
+"birth": "1996/01/27"
+}
+</script>
+
+</header>
+
+
+
+<!-- // view include -->
+
+
+
+
+  <div class="contents">
+    <!-- =============================================================================== -->
+    <!-- ==================メインコンテンツ ================================================== -->
+    <!-- =============================================================================== -->
+    <div id="main" class="cart">
+      <div class="cart-header">
+        <h1 class="page-title">カート</h1>
+        <div class="cart-step">
+          <ol class="cart-step-list">
+            <li class="cart-step-list-item is_current">
+              <div class="cart-step-list-item-num">1</div>
+              <div class="cart-step-list-item-text">カート</div>
+            </li>
+            <li class="cart-step-list-item">
+              <div class="cart-step-list-item-num">2</div>
+              <div class="cart-step-list-item-text">ログイン</div>
+            </li>
+            <li class="cart-step-list-item">
+              <div class="cart-step-list-item-num">3</div>
+              <div class="cart-step-list-item-text">ご注文情報<br />入力</div>
+            </li>
+            <li class="cart-step-list-item">
+              <div class="cart-step-list-item-num">4</div>
+              <div class="cart-step-list-item-text">ご注文情報<br />確認</div>
+            </li>
+            <li class="cart-step-list-item">
+              <div class="cart-step-list-item-num">5</div>
+              <div class="cart-step-list-item-text">ご注文<br />完了</div>
+            </li>
+          </ol>
+        </div>
+      </div>
+      <!-- cartIndex -->
+      <div id="cartIndex">
+
+        
+
+<!-- view include -->
+
+
+
+<!-- error -->
+
+<!-- / error -->
+
+
+<!-- // view include -->
+
+
+
+
+        
+        <div>
+          <div class="empty">
+            <p class="form-message">カートの中には何も入っていません。</p>
+            <div class="btns">
+              <!-- 前回見ていたページへ戻る（購入履歴・お気に入りリスト等のhttpsのページから遷移してきた場合は戻れない場合があります） -->
+              <a href="https://parks2.bandainamco-am.co.jp/" class="btn btn-cancel btn-size-l">戻る</a>
+              <!-- <a href="javascript:history.back();" class="btn btn-cancel btn-size-l">戻る</a> -->
+            </div>
+          </div>
+          <form name="cartFrm" action="https://parks2.bandainamco-am.co.jp/cart_index.html" method="post"><input type="hidden" name="request" value="insert" /><input type="hidden" name="item_cd" /><input type="hidden" name="seisan_page_id" /><input type="hidden" name="key" /><input type="hidden" name="index" /><input type="hidden" name="CART_INDEX_REFERER" value="https://parks2.bandainamco-am.co.jp/" />
+            
+          </form>
+        </div>
+        
+      </div>
+      <!-- / cartIndex -->
+
+    </div>
+    <!-- =============================================================================== -->
+    <!-- ==================メインコンテンツ END================================================== -->
+    <!-- =============================================================================== -->
+  </div>
+  
+  
+<!-- view include -->
+
+
+<div class="block-item-history">
+  <h2 class="h2"><span class="ja">最近チェックした商品</span></h2>
+  <div class="block-item-history-inner">
+    <div class="item-list-wrapper js_item-list-slider-wrapper">
+      <ul class="item-list js_item-list-slider">
+        <li class="item-list-item">
+          <div class="item-list-item-img">
+            <a href="https://parks2.bandainamco-am.co.jp/item/ECCL00000043_20260704_05_023.html" title="【富山高岡店】7/4・5【抽選申込】 ONE PIECEカードゲーム 『ブースターパック 決戦の刻【OP-16】』購入権チケット"><img src="/client_info/BNAM_LBC_EC/itemimage/ECCL00000043_20260704_05_023/OPCG16_pillow_dummy.png" alt="【富山高岡店】7/4・5【抽選申込】 ONE PIECEカードゲーム 『ブースターパック 決戦の刻【OP-16】』購入権チケット" /></a>
+          </div>
+          <div class="item-list-item-info">
+            <div class="item-list-item-icons js-item-icons">
+              <span class="js_status-flag" style="display: none;">2</span>
+              <span class="item-list-item-icon item-icon-status js_status-icon"></span>
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+            </div>
+            <div class="item-list-item-name"><a href="https://parks2.bandainamco-am.co.jp/item/ECCL00000043_20260704_05_023.html" title="【富山高岡店】7/4・5【抽選申込】 ONE PIECEカードゲーム 『ブースターパック 決戦の刻【OP-16】』購入権チケット">【富山高岡店】7/4・5【抽選申込】 ONE PIECEカードゲーム 『ブースターパック 決戦の刻【OP-16】』購入権チケット</a></div>
+            <div class="item-list-item-price">
+              <div class="standard-price">
+                <span class="price-value-label">0円</span><span class="price-unit-label">円</span><span class="tax-label">(税込)</span>
+              </div>
+            </div>
+            
+            
+          </div>
+        </li>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+      </ul>
+    </div>
+  </div>
+</div>
+<footer class="footer">
+  <div class="footer-pagetop">
+    <a href="#"></a>
+  </div>
+  <div class="footer-row1">
+    <div class="footer-logo"><a href="https://parks.bandainamco-am.co.jp/"><img src="/client_info/BNAM_LBC_EC/view/userweb/./images/logo_footer.png?timestamp=1782449541732" alt="ナムコパークス" /></a></div>
+  </div>
+  <div class="footer-row2">
+    <div class="footer-menu">
+      <ul class="footer-menu-list">
+        <li class="footer-menu-list-item"><a href="https://parks2.bandainamco-am.co.jp/ext/beginners.html"><span class="icon icon-guide"></span>初めての方へ</a></li>
+        <li class="footer-menu-list-item"><a href="https://parks2.bandainamco-am.co.jp/ext/guide.html"><span class="icon icon-guide"></span>ご利用ガイド</a></li>
+        <li class="footer-menu-list-item"><a href="https://bnam-customer.my.site.com/NamcoParks/s/" target="_blank"><span class="icon icon-talk"></span>よくある質問・お問い合わせ</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-row3">
+    <div class="footer-company-info">
+      <ul class="footer-company-info-list">
+        <li class="footer-company-info-list-item"><a href="https://bandainamco-am.co.jp/company/" target="_blank">会社概要</a></li>
+        <li class="footer-company-info-list-item"><a href="https://parks2.bandainamco-am.co.jp/ext/web_accessibility.html">ウェブアクセシビリティ方針</a></li>
+        <li class="footer-company-info-list-item"><a href="https://parks2.bandainamco-am.co.jp/ext/kiyaku.html">利用規約</a></li>
+        <li class="footer-company-info-list-item"><a href="https://am.bandainamco-am.co.jp/privacy/" target="_blank">プライバシーポリシー</a></li>
+        <li class="footer-company-info-list-item"><a href="https://parks2.bandainamco-am.co.jp/ext/tokushou.html">特定商取引法に基づく表示</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+<script type="text/javascript" src="https://bandainamco-am.co.jp/am/js/commonFooter.js"></script>
+
+
+<!-- // view include -->
+
+
+</div>
+
+<!-- GTM Data Layer START -->
+<script>
+
+   var transactionid = document.getElementsByName('ORDER_DISP_NO').item(0).value;
+   var transactionmember = document.getElementsByName('MEMBER_ID').item(0).value;
+   var transactiontotal = document.getElementsByName('GOKEI').item(0).value;
+   var transactionshokei = document.getElementsByName('SYOKEI').item(0).value;
+   var transactionsoryo = document.getElementsByName('SORYO').item(0).value;
+   var transactionkessai = document.getElementsByName('KESSAI_NAME').item(0).value;
+   var transactionwaribiki = document.getElementsByName('WARIBIKI_SUM').item(0).value;
+   var products = [];
+
+   var now=new Date(); //transaction_idが使えないので、今の日時を仮の取引IDとする
+   var year=now.getFullYear();
+   var month=now.getMonth()+1;
+   var day=now.getDate();
+   var hour=now.getHours();
+   var minute=now.getMinutes();
+   var new_id=year+"/"+month+"/"+day+"-"+hour+":"+minute+"-"+transactionmember
+   var kubunlist={1:"在庫商品",2:"受注生産商品",3:"ミニゲーム本体",4:"ミニゲーム景品",5:"ガシャポン本体",6:"ガシャポン景品",7:"eチケット商品",8:"デジタルフラワースタンド"}
+   var g_kubunlist={"":"指定なし",1:"在庫販売",2:"受注販売"}
+
+   data={
+   event: "pre_purchase",
+   ecommerce:{
+   transaction_id:new_id,
+   npos_id:transactionmember,
+   value:transactiontotal,
+   shokei:transactionshokei,
+   shipping:transactionsoryo,
+   currency: "JPY",
+   payment_type:transactionkessai,
+   waribiki:transactionwaribiki,
+   items:products}
+   }
+   for (var i=0; i<document.getElementsByName('ITEM_NAME').length; i++){
+        var itemname = document.getElementsByName('ITEM_NAME').item(i).value;
+        var sku = document.getElementsByName('ITEM_CD_ONLY').item(i).value;
+        var kubun = kubunlist[document.getElementsByName('ITEM_FREE_ITEM1').item(i).value];
+        var category = document.getElementsByName('ITEM_FREE_ITEM18').item(i).value;
+        var ipname = document.getElementsByName('ITEM_FREE_ITEM21').item(i).value;
+        var gashakubun = g_kubunlist[document.getElementsByName('ITEM_FREE_ITEM37').item(i).value];
+        var price = document.getElementsByName('ITEM_TEIKA').item(i).value;
+        var quantity = document.getElementsByName('ITEM_AMOUNT').item(i).value;
+        products = {
+        'item_name': itemname,
+        'item_id': sku,
+        'item_category':kubun,
+        'item_category2':category,
+        'item_category3':ipname,
+        'item_category4':gashakubun,
+        'price':price,
+        'quantity':quantity
+        }
+        data.ecommerce.items.push(products)}
+
+   window.dataLayer = window.dataLayer || [];
+   dataLayer.push({ ecommerce: null });  // Clear the previous ecommerce object.
+   dataLayer.push(data)
+   console.log(dataLayer);
+</script>
+<!-- GTM Data Layer END --></body>
+</html>

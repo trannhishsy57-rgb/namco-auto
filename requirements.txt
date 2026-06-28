@@ -1,0 +1,8 @@
+# Install with: py -3.12 -m pip install -r requirements.txt
+# Python 3.12 required (3.14a5 crashes with bs4/lxml ABI mismatch)
+httpx[http2]>=0.27
+aiosqlite>=0.20
+beautifulsoup4>=4.12
+lxml>=5.0
+urllib3>=2.0
+# tomllib — stdlib since Python 3.11, no install needed

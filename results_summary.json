@@ -1,0 +1,26 @@
+[
+  {
+    "ticket": {
+      "name": "【富山高岡店】7/4・5【抽選申込】 ONE PIECEカードゲーム 『ブースターパック 決戦の刻【OP-16】』購入権チケット",
+      "url": "https://parks2.bandainamco-am.co.jp/category/EL/ECCL00000043_20260704_05_023.html"
+    },
+    "form_data": {
+      "request": "",
+      "item_cd2": "ECCL00000043_20260704_05_023",
+      "item_cd": "ECCL00000043_20260704_05_023",
+      "WISH_LIST_ID": "",
+      "token": "5733493933d5b1e961e729355d563412",
+      "key": "",
+      "PRIORITY_ITEMPROPERTY_CD_MATRIX_0": "",
+      "CART_AMOUNT_0": "1"
+    },
+    "submit_result": {
+      "status_code": 200,
+      "final_url": "https://parks2.bandainamco-am.co.jp/cart_index.html",
+      "success": true,
+      "message": "ナムコパークス オンラインストア | NAMCO Parks",
+      "debug_file": "C:\\Users\\da983\\Downloads\\namco-auto\\submit_response_1782565285.html"
+    },
+    "status": "submitted"
+  }
+]

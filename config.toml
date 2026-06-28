@@ -1,0 +1,49 @@
+db_path      = "namco_tasks.db"
+log_level    = "INFO"
+mode         = "checkout"   # dry / cart / checkout
+results_file = "results.jsonl"
+
+[[accounts]]
+email        = "rekv68w80t@livee.email"
+password     = "Qwe123456"
+target_store = ""           # 留空则自动选第一个可用店铺
+proxy        = ""           # 留空则不用代理
+
+# 添加更多账号：
+# [[accounts]]
+# email        = "account2@example.com"
+# password     = "pass2"
+# target_store = "東京"
+# proxy        = "http://user:pass@jp-proxy2:port"
+
+[scheduler]
+max_concurrent = 3
+delay_min      = 3.0
+delay_max      = 7.0
+
+[retry]
+max_attempts  = 3
+initial_wait  = 5.0
+max_wait      = 40.0
+jitter        = 5.0
+
+[proxy]
+# 全局代理池（账号未单独配置代理时轮流使用）
+pool      = []
+max_fails = 3
+# pool = [
+#   "http://user:pass@jp-residential1:port",
+#   "http://user:pass@jp-residential2:port",
+# ]
+
+[rate_limit]
+requests_per_second = 0.5   # 每账号每秒最多 0.5 个请求（即 2s 间隔）
+burst               = 2
+
+[circuit_breaker]
+failure_threshold = 5
+recovery_timeout  = 120.0
+
+[target]
+event_keyword   = "OP-16"
+lottery_keyword = "抽選"

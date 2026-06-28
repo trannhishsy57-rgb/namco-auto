@@ -1,0 +1,264 @@
+{
+  "log": {
+    "version": "1.2",
+    "creator": {
+      "name": "namco-auto",
+      "version": "2.0"
+    },
+    "entries": [
+      {
+        "startedDateTime": "2026-06-27T13:01:11.469700+00:00",
+        "request": {
+          "method": "GET",
+          "url": "https://parks2.bandainamco-am.co.jp/login.html",
+          "headers": {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36",
+            "Accept-Encoding": "gzip, deflate, br, zstd",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Connection": "keep-alive",
+            "Accept-Language": "ja,en;q=0.9"
+          },
+          "body": ""
+        },
+        "response": {
+          "status": 200,
+          "statusText": "200",
+          "headers": {
+            "Content-Type": "text/html;charset=utf-8",
+            "Transfer-Encoding": "chunked",
+            "Connection": "keep-alive",
+            "Date": "Sat, 27 Jun 2026 13:01:11 GMT",
+            "Vary": "Accept-Encoding,User-Agent",
+            "Content-Encoding": "gzip",
+            "Set-Cookie": "AWSALB=xwVJS/jCZFvbJEGWyTPqYbeXrEf4XogpD2BV2Rf4sfBD3gcP8qvf3hnIdbl092XTShR8l4n13WoiY8XVJ42A4ahkjKEQ1NEqmuZ518uorHLLB4JYEqoEQyCqBB8D; Expires=Sat, 04 Jul 2026 13:01:11 GMT; Path=/, AWSALBCORS=xwVJS/jCZFvbJEGWyTPqYbeXrEf4XogpD2BV2Rf4sfBD3gcP8qvf3hnIdbl092XTShR8l4n13WoiY8XVJ42A4ahkjKEQ1NEqmuZ518uorHLLB4JYEqoEQyCqBB8D; Expires=Sat, 04 Jul 2026 13:01:11 GMT; Path=/; SameSite=None; Secure, JSESSIONID=2F0DCD683A610DF0D6D0106FE1D73368.ebiuws-as-01-i-02fb25f7d9f7a6111; Path=/; HttpOnly, framework.security_id=c1f0a5c0913580b8f0896b171ee0b947; Path=/; Secure, esi_2844_UW=2F0DCD683A610DF0D6D0106FE1D73368.ebiuws-as-01-i-02fb25f7d9f7a6111; Path=/; HttpOnly, __s__esi_2844_UW=2F0DCD683A610DF0D6D0106FE1D73368.ebiuws-as-01-i-02fb25f7d9f7a6111; Path=/; Secure; SameSite=None; HttpOnly, __s__ack_2844_UW=503213525_2F0DCD683A610DF0D6D0106FE1D73368.ebiuws-as-01-i-02fb25f7d9f7a6111; Expires=Sun, 27-Jun-2027 13:01:11 GMT; Path=/; Secure; SameSite=None; HttpOnly, JSESSIONID=2F0DCD683A610DF0D6D0106FE1D73368.ebiuws-as-01-i-02fb25f7d9f7a6111; Path=/; Secure; SameSite=None; HttpOnly",
+            "Server": "Apache",
+            "X-Content-Type-Options": "nosniff",
+            "Pragma": "no-cache",
+            "Cache-control": "no-cache, no-store",
+            "Expires": "Thu, 01 Dec 1994 16:00:00 GMT",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Strict-Transport-Security": "max-age=63072000; includeSubDomains;",
+            "X-XSS-Protection": "1; mode=block",
+            "X-Cache": "Miss from cloudfront",
+            "Via": "1.1 74519eaf9467fae86738c8eb53833d12.cloudfront.net (CloudFront)",
+            "X-Amz-Cf-Pop": "HKG54-P2",
+            "X-Amz-Cf-Id": "iZGnn13BBfwG2J8Zi2usoRG_f8u0SgVRm3JAzCXXXOhxMXq3eNKtgA=="
+          },
+          "cookies": {
+            "AWSALB": "xwVJS/jCZFvbJEGWyTPqYbeXrEf4XogpD2BV2Rf4sfBD3gcP8qvf3hnIdbl092XTShR8l4n13WoiY8XVJ42A4ahkjKEQ1NEqmuZ518uorHLLB4JYEqoEQyCqBB8D",
+            "AWSALBCORS": "xwVJS/jCZFvbJEGWyTPqYbeXrEf4XogpD2BV2Rf4sfBD3gcP8qvf3hnIdbl092XTShR8l4n13WoiY8XVJ42A4ahkjKEQ1NEqmuZ518uorHLLB4JYEqoEQyCqBB8D",
+            "JSESSIONID": "2F0DCD683A610DF0D6D0106FE1D73368.ebiuws-as-01-i-02fb25f7d9f7a6111",
+            "framework.security_id": "c1f0a5c0913580b8f0896b171ee0b947",
+            "esi_2844_UW": "2F0DCD683A610DF0D6D0106FE1D73368.ebiuws-as-01-i-02fb25f7d9f7a6111",
+            "__s__esi_2844_UW": "2F0DCD683A610DF0D6D0106FE1D73368.ebiuws-as-01-i-02fb25f7d9f7a6111",
+            "__s__ack_2844_UW": "503213525_2F0DCD683A610DF0D6D0106FE1D73368.ebiuws-as-01-i-02fb25f7d9f7a6111"
+          },
+          "redirectUrl": "",
+          "bodySize": 21788,
+          "bodyPreview": "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n<html xmlns:aps=\"eb:AMAZON_PAYMENTS/view_amazon_payments.json\" xmlns:social_plus=\"eb:SOCIAL_PLUS/view_common.json\" xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"ja\" lang=\"ja\">\n<head>\n<title>ナムコパークス オンラインストア | NAMCO Parks</title>\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\n<meta http-equiv=\"Content-Style-Type\" content=\"text/css\" />\n<meta http-equiv=\"Content-Script-Type\" content=\"text/javascript\" />\n<meta name=\"format-detection\" content=\"telephone=no\" />\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no\" />\n<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge,chrome=1\" />\n<title>ナムコパークス オンラインストア | NAMCO Parks</title>\n<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" />\n<link href=\"https://fonts.googleapis.com/css2?family=Oswald:wght@200;300;400;500;600;700&display=swap\" rel=\"stylesheet\" />\n<link href=\"/client_info/BNAM_LBC_EC/view/userweb/lib/slick/slick.css?timestamp=1782449541732\" rel=\"stylesheet\" type=\"text/css\" />\n<link href=\"/client_info/BNAM_LBC_EC/view/userweb/lib/slick/slick-theme.css?timestamp=1782449541732\" rel=\"stylesheet\" type=\"text/css\" />\n<link href=\"/client_info/BNAM_LBC_EC/view/userweb/lib/mCustomScrollbar/jquery.mCustomScrollbar.min.css?timestamp=1782449541732\" rel=\"stylesheet\" type=\"text/css\" />\n<link href=\"/client_info/BNAM_LBC_EC/view/userweb/css/style.css?timestamp=1782449541732\" rel=\"stylesheet\" type=\"text/css\" />\n<link href=\"/client_info/BNAM_LBC_EC/view/userweb/css/style_modifier.css?timestamp=1782449541732\" rel=\"stylesheet\" type=\"text/css\" />\n<link href=\"/client_info/BNAM_LBC_EC/view/userweb/favicon.ico?timestamp=1782449541732\" rel=\"shortcut icon\" />\n<script src=\"/client_info/BNAM_LBC_EC/view/userweb/js/ebisu_lib.latest.js?timestamp=1782449541732\" type=\"text/javascript\" charset=\"utf-8\"></script>\n\n<script src=\"/client_info/BNAM_LBC_EC/v"
+        }
+      },
+      {
+        "startedDateTime": "2026-06-27T13:01:14.994308+00:00",
+        "request": {
+          "method": "POST",
+          "url": "https://parks2.bandainamco-am.co.jp/top_login.html",
+          "headers": {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36",
+            "Accept-Encoding": "gzip, deflate, br, zstd",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Connection": "keep-alive",
+            "Accept-Language": "ja,en;q=0.9"
+          },
+          "body": "{\"request\": \"logon\", \"redirectTo\": \"\", \"LOGINID\": \"rekv68w80t@livee.email\", \"PASSWORD\": \"Qwe123456\", \"jp.co.interfactory.framework.trim.LOGINID\": \"\", \"jp.co.interfactory.framework.lower.LOGINID\": \"\"}"
+        },
+        "response": {
+          "status": 200,
+          "statusText": "200",
+          "headers": {
+            "Content-Type": "text/html;charset=utf-8",
+            "Transfer-Encoding": "chunked",
+            "Connection": "keep-alive",
+            "Date": "Sat, 27 Jun 2026 13:01:15 GMT",
+            "Vary": "Accept-Encoding,User-Agent",
+            "Content-Encoding": "gzip",
+            "Set-Cookie": "AWSALB=yAVPb4HtV+nrfziycW6xC0CyX7Pxml4LavXIYc/Vm+0kQo7nlJPCZmahSbnrn/F42D9nY0OQPmSsOP2a1K5/NXzUmyC/ZoXyoIFDCdDqDbu+fAiePJ/zmY/Wb4cU; Expires=Sat, 04 Jul 2026 13:01:12 GMT; Path=/, AWSALBCORS=yAVPb4HtV+nrfziycW6xC0CyX7Pxml4LavXIYc/Vm+0kQo7nlJPCZmahSbnrn/F42D9nY0OQPmSsOP2a1K5/NXzUmyC/ZoXyoIFDCdDqDbu+fAiePJ/zmY/Wb4cU; Expires=Sat, 04 Jul 2026 13:01:12 GMT; Path=/; SameSite=None; Secure, __s__esi_2844_UW=2F0DCD683A610DF0D6D0106FE1D73368.ebiuws-as-01-i-02fb25f7d9f7a6111; Path=/; Secure; SameSite=None; HttpOnly, __s__ack_2844_UW=503213525_2F0DCD683A610DF0D6D0106FE1D73368.ebiuws-as-01-i-02fb25f7d9f7a6111; Expires=Sun, 27-Jun-2027 13:01:12 GMT; Path=/; Secure; SameSite=None; HttpOnly, JSESSIONID=2F0DCD683A610DF0D6D0106FE1D73368.ebiuws-as-01-i-02fb25f7d9f7a6111; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:10 GMT, JSESSIONID=2F0DCD683A610DF0D6D0106FE1D73368.ebiuws-as-01-i-02fb25f7d9f7a6111; Path=/; Secure; SameSite=None; HttpOnly",
+            "Server": "Apache",
+            "X-Content-Type-Options": "nosniff",
+            "Pragma": "no-cache",
+            "Cache-control": "no-cache, no-store",
+            "Expires": "Thu, 01 Dec 1994 16:00:00 GMT",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Strict-Transport-Security": "max-age=63072000; includeSubDomains;",
+            "X-XSS-Protection": "1; mode=block",
+            "X-Cache": "Miss from cloudfront",
+            "Via": "1.1 74519eaf9467fae86738c8eb53833d12.cloudfront.net (CloudFront)",
+            "X-Amz-Cf-Pop": "HKG54-P2",
+            "X-Amz-Cf-Id": "dQZcyGwjzsdtXWWexC7ViuopfshN74Gz3dsZxDkqme4IU_ugp2ZUsQ=="
+          },
+          "cookies": {
+            "AWSALB": "yAVPb4HtV+nrfziycW6xC0CyX7Pxml4LavXIYc/Vm+0kQo7nlJPCZmahSbnrn/F42D9nY0OQPmSsOP2a1K5/NXzUmyC/ZoXyoIFDCdDqDbu+fAiePJ/zmY/Wb4cU",
+            "AWSALBCORS": "yAVPb4HtV+nrfziycW6xC0CyX7Pxml4LavXIYc/Vm+0kQo7nlJPCZmahSbnrn/F42D9nY0OQPmSsOP2a1K5/NXzUmyC/ZoXyoIFDCdDqDbu+fAiePJ/zmY/Wb4cU",
+            "__s__esi_2844_UW": "2F0DCD683A610DF0D6D0106FE1D73368.ebiuws-as-01-i-02fb25f7d9f7a6111",
+            "__s__ack_2844_UW": "503213525_2F0DCD683A610DF0D6D0106FE1D73368.ebiuws-as-01-i-02fb25f7d9f7a6111",
+            "JSESSIONID": "2F0DCD683A610DF0D6D0106FE1D73368.ebiuws-as-01-i-02fb25f7d9f7a6111"
+          },
+          "redirectUrl": "",
+          "bodySize": 98091,
+          "bodyPreview": "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"ja\" lang=\"ja\">\n<head>\n<title>ナムコパークス オンラインストア | NAMCO Parks</title>\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\n<meta http-equiv=\"Content-Style-Type\" content=\"text/css\" />\n<meta http-equiv=\"Content-Script-Type\" content=\"text/javascript\" />\n<meta name=\"format-detection\" content=\"telephone=no\" />\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no\" />\n<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge,chrome=1\" />\n<title>ナムコパークス オンラインストア | NAMCO Parks</title>\n<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" />\n<link href=\"https://fonts.googleapis.com/css2?family=Oswald:wght@200;300;400;500;600;700&display=swap\" rel=\"stylesheet\" />\n<link href=\"/client_info/BNAM_LBC_EC/view/userweb/lib/slick/slick.css?timestamp=1782449541732\" rel=\"stylesheet\" type=\"text/css\" />\n<link href=\"/client_info/BNAM_LBC_EC/view/userweb/lib/slick/slick-theme.css?timestamp=1782449541732\" rel=\"stylesheet\" type=\"text/css\" />\n<link href=\"/client_info/BNAM_LBC_EC/view/userweb/lib/mCustomScrollbar/jquery.mCustomScrollbar.min.css?timestamp=1782449541732\" rel=\"stylesheet\" type=\"text/css\" />\n<link href=\"/client_info/BNAM_LBC_EC/view/userweb/css/style.css?timestamp=1782449541732\" rel=\"stylesheet\" type=\"text/css\" />\n<link href=\"/client_info/BNAM_LBC_EC/view/userweb/css/style_modifier.css?timestamp=1782449541732\" rel=\"stylesheet\" type=\"text/css\" />\n<link href=\"/client_info/BNAM_LBC_EC/view/userweb/favicon.ico?timestamp=1782449541732\" rel=\"shortcut icon\" />\n<script src=\"/client_info/BNAM_LBC_EC/view/userweb/js/ebisu_lib.latest.js?timestamp=1782449541732\" type=\"text/javascript\" charset=\"utf-8\"></script>\n\n<script src=\"/client_info/BNAM_LBC_EC/view/userweb/js/ebisu.js?timestamp=1782449541732\" type=\"text/javascript\" charset=\"utf-8\"></script>\n<script src"
+        }
+      },
+      {
+        "startedDateTime": "2026-06-27T13:01:22.075711+00:00",
+        "request": {
+          "method": "GET",
+          "url": "https://parks2.bandainamco-am.co.jp/category/EL/",
+          "headers": {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36",
+            "Accept-Encoding": "gzip, deflate, br, zstd",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Connection": "keep-alive",
+            "Accept-Language": "ja,en;q=0.9"
+          },
+          "body": ""
+        },
+        "response": {
+          "status": 200,
+          "statusText": "200",
+          "headers": {
+            "Content-Type": "text/html;charset=utf-8",
+            "Transfer-Encoding": "chunked",
+            "Connection": "keep-alive",
+            "Date": "Sat, 27 Jun 2026 13:01:22 GMT",
+            "Vary": "Accept-Encoding,User-Agent",
+            "Content-Encoding": "gzip",
+            "Set-Cookie": "AWSALB=vZkgXXnL3Fr93EQT8dnwlpb4jOf5RUpUYg4zm3t4ozh2ISweApJPqIASMn5aU4JrNFUhRWR0uyRqA2Gy5XY7xtdMG09muIxUkD3baKt96j0D5a/c6Oqo1Wn/v9y9; Expires=Sat, 04 Jul 2026 13:01:19 GMT; Path=/, AWSALBCORS=vZkgXXnL3Fr93EQT8dnwlpb4jOf5RUpUYg4zm3t4ozh2ISweApJPqIASMn5aU4JrNFUhRWR0uyRqA2Gy5XY7xtdMG09muIxUkD3baKt96j0D5a/c6Oqo1Wn/v9y9; Expires=Sat, 04 Jul 2026 13:01:19 GMT; Path=/; SameSite=None; Secure, __s__esi_2844_UW=2F0DCD683A610DF0D6D0106FE1D73368.ebiuws-as-01-i-02fb25f7d9f7a6111; Path=/; Secure; SameSite=None; HttpOnly, __s__ack_2844_UW=503213525_2F0DCD683A610DF0D6D0106FE1D73368.ebiuws-as-01-i-02fb25f7d9f7a6111; Expires=Sun, 27-Jun-2027 13:01:19 GMT; Path=/; Secure; SameSite=None; HttpOnly, JSESSIONID=2F0DCD683A610DF0D6D0106FE1D73368.ebiuws-as-01-i-02fb25f7d9f7a6111; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:10 GMT, JSESSIONID=2F0DCD683A610DF0D6D0106FE1D73368.ebiuws-as-01-i-02fb25f7d9f7a6111; Path=/; Secure; SameSite=None; HttpOnly",
+            "Server": "Apache",
+            "X-Content-Type-Options": "nosniff",
+            "Pragma": "no-cache",
+            "Cache-control": "no-cache, no-store",
+            "Expires": "Thu, 01 Dec 1994 16:00:00 GMT",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Strict-Transport-Security": "max-age=63072000; includeSubDomains;",
+            "X-XSS-Protection": "1; mode=block",
+            "X-Cache": "Miss from cloudfront",
+            "Via": "1.1 74519eaf9467fae86738c8eb53833d12.cloudfront.net (CloudFront)",
+            "X-Amz-Cf-Pop": "HKG54-P2",
+            "X-Amz-Cf-Id": "iHPi2ubBr0_f1ee8VNth-eqwfbirO03U7-0vLFayC99fG5oPt4Y-2g=="
+          },
+          "cookies": {
+            "AWSALB": "vZkgXXnL3Fr93EQT8dnwlpb4jOf5RUpUYg4zm3t4ozh2ISweApJPqIASMn5aU4JrNFUhRWR0uyRqA2Gy5XY7xtdMG09muIxUkD3baKt96j0D5a/c6Oqo1Wn/v9y9",
+            "AWSALBCORS": "vZkgXXnL3Fr93EQT8dnwlpb4jOf5RUpUYg4zm3t4ozh2ISweApJPqIASMn5aU4JrNFUhRWR0uyRqA2Gy5XY7xtdMG09muIxUkD3baKt96j0D5a/c6Oqo1Wn/v9y9",
+            "__s__esi_2844_UW": "2F0DCD683A610DF0D6D0106FE1D73368.ebiuws-as-01-i-02fb25f7d9f7a6111",
+            "__s__ack_2844_UW": "503213525_2F0DCD683A610DF0D6D0106FE1D73368.ebiuws-as-01-i-02fb25f7d9f7a6111",
+            "JSESSIONID": "2F0DCD683A610DF0D6D0106FE1D73368.ebiuws-as-01-i-02fb25f7d9f7a6111"
+          },
+          "redirectUrl": "",
+          "bodySize": 219664,
+          "bodyPreview": "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"ja\" lang=\"ja\">\n<head>\n<title>入場チケット | ナムコパークス オンラインストア | NAMCO Parks</title>\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\n<meta http-equiv=\"Content-Style-Type\" content=\"text/css\" />\n<meta http-equiv=\"Content-Script-Type\" content=\"text/javascript\" />\n<meta name=\"format-detection\" content=\"telephone=no\" />\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no\" />\n<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge,chrome=1\" />\n<title>入場チケット | ナムコパークス オンラインストア | NAMCO Parks</title>\n<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" />\n<link href=\"https://fonts.googleapis.com/css2?family=Oswald:wght@200;300;400;500;600;700&display=swap\" rel=\"stylesheet\" />\n<link href=\"/client_info/BNAM_LBC_EC/view/userweb/lib/slick/slick.css?timestamp=1782449541732\" rel=\"stylesheet\" type=\"text/css\" />\n<link href=\"/client_info/BNAM_LBC_EC/view/userweb/lib/slick/slick-theme.css?timestamp=1782449541732\" rel=\"stylesheet\" type=\"text/css\" />\n<link href=\"/client_info/BNAM_LBC_EC/view/userweb/lib/mCustomScrollbar/jquery.mCustomScrollbar.min.css?timestamp=1782449541732\" rel=\"stylesheet\" type=\"text/css\" />\n<link href=\"/client_info/BNAM_LBC_EC/view/userweb/css/style.css?timestamp=1782449541732\" rel=\"stylesheet\" type=\"text/css\" />\n<link href=\"/client_info/BNAM_LBC_EC/view/userweb/css/style_modifier.css?timestamp=1782449541732\" rel=\"stylesheet\" type=\"text/css\" />\n<link href=\"/client_info/BNAM_LBC_EC/view/userweb/favicon.ico?timestamp=1782449541732\" rel=\"shortcut icon\" />\n<script src=\"/client_info/BNAM_LBC_EC/view/userweb/js/ebisu_lib.latest.js?timestamp=1782449541732\" type=\"text/javascript\" charset=\"utf-8\"></script>\n\n<script src=\"/client_info/BNAM_LBC_EC/view/userweb/js/ebisu.js?timestamp=1782449541732\" type=\"text/javascript\" charset=\"utf-8\"></s"
+        }
+      },
+      {
+        "startedDateTime": "2026-06-27T13:01:24.365260+00:00",
+        "request": {
+          "method": "GET",
+          "url": "https://parks2.bandainamco-am.co.jp/category/EL/ECCL00000043_20260704_05_023.html",
+          "headers": {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36",
+            "Accept-Encoding": "gzip, deflate, br, zstd",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Connection": "keep-alive",
+            "Accept-Language": "ja,en;q=0.9"
+          },
+          "body": ""
+        },
+        "response": {
+          "status": 200,
+          "statusText": "200",
+          "headers": {
+            "Content-Type": "text/html;charset=utf-8",
+            "Transfer-Encoding": "chunked",
+            "Connection": "keep-alive",
+            "Date": "Sat, 27 Jun 2026 13:01:24 GMT",
+            "Vary": "Accept-Encoding,User-Agent",
+            "Content-Encoding": "gzip",
+            "Set-Cookie": "AWSALB=3+oBWKqRK1FWvi2y4F8nRmBO+9BqPpk2rBjAbTYmzVZnDbxp8TFX7VIXXeoY0hFyH7qeAjPltv9fTjDsxmSTAAZ5nCfgTnOrzrFccg+t+iUOQUSY7IGeoUH0QH1Y; Expires=Sat, 04 Jul 2026 13:01:22 GMT; Path=/, AWSALBCORS=3+oBWKqRK1FWvi2y4F8nRmBO+9BqPpk2rBjAbTYmzVZnDbxp8TFX7VIXXeoY0hFyH7qeAjPltv9fTjDsxmSTAAZ5nCfgTnOrzrFccg+t+iUOQUSY7IGeoUH0QH1Y; Expires=Sat, 04 Jul 2026 13:01:22 GMT; Path=/; SameSite=None; Secure, __s__esi_2844_UW=2F0DCD683A610DF0D6D0106FE1D73368.ebiuws-as-01-i-02fb25f7d9f7a6111; Path=/; Secure; SameSite=None; HttpOnly, __s__ack_2844_UW=503213525_2F0DCD683A610DF0D6D0106FE1D73368.ebiuws-as-01-i-02fb25f7d9f7a6111; Expires=Sun, 27-Jun-2027 13:01:22 GMT; Path=/; Secure; SameSite=None; HttpOnly, JSESSIONID=2F0DCD683A610DF0D6D0106FE1D73368.ebiuws-as-01-i-02fb25f7d9f7a6111; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:10 GMT, JSESSIONID=2F0DCD683A610DF0D6D0106FE1D73368.ebiuws-as-01-i-02fb25f7d9f7a6111; Path=/; Secure; SameSite=None; HttpOnly, jp.co.interfactory.ebisu.common.ItemAccessLog.ITEM_ACCESS_LOG=35796; Expires=Sun, 27-Jun-2027 13:01:23 GMT; Path=/; Secure; SameSite=None",
+            "Server": "Apache",
+            "X-Content-Type-Options": "nosniff",
+            "Pragma": "no-cache",
+            "Cache-control": "no-cache, no-store",
+            "Expires": "Thu, 01 Dec 1994 16:00:00 GMT",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Strict-Transport-Security": "max-age=63072000; includeSubDomains;",
+            "X-XSS-Protection": "1; mode=block",
+            "X-Cache": "Miss from cloudfront",
+            "Via": "1.1 74519eaf9467fae86738c8eb53833d12.cloudfront.net (CloudFront)",
+            "X-Amz-Cf-Pop": "HKG54-P2",
+            "X-Amz-Cf-Id": "IRGappqCqxlGzLzHST1tcbXHYXIl73joTPJ8yix5tstZoHj9-LdSBg=="
+          },
+          "cookies": {
+            "AWSALB": "3+oBWKqRK1FWvi2y4F8nRmBO+9BqPpk2rBjAbTYmzVZnDbxp8TFX7VIXXeoY0hFyH7qeAjPltv9fTjDsxmSTAAZ5nCfgTnOrzrFccg+t+iUOQUSY7IGeoUH0QH1Y",
+            "AWSALBCORS": "3+oBWKqRK1FWvi2y4F8nRmBO+9BqPpk2rBjAbTYmzVZnDbxp8TFX7VIXXeoY0hFyH7qeAjPltv9fTjDsxmSTAAZ5nCfgTnOrzrFccg+t+iUOQUSY7IGeoUH0QH1Y",
+            "__s__esi_2844_UW": "2F0DCD683A610DF0D6D0106FE1D73368.ebiuws-as-01-i-02fb25f7d9f7a6111",
+            "__s__ack_2844_UW": "503213525_2F0DCD683A610DF0D6D0106FE1D73368.ebiuws-as-01-i-02fb25f7d9f7a6111",
+            "JSESSIONID": "2F0DCD683A610DF0D6D0106FE1D73368.ebiuws-as-01-i-02fb25f7d9f7a6111",
+            "jp.co.interfactory.ebisu.common.ItemAccessLog.ITEM_ACCESS_LOG": "35796"
+          },
+          "redirectUrl": "",
+          "bodySize": 95051,
+          "bodyPreview": "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"ja\" lang=\"ja\">\n<head>\n<title>【富山高岡店】7/4・5【抽選申込】 ONE PIECEカードゲーム 『ブースターパック 決戦の刻【OP-16】』購入権チケット | ナムコパークス オンラインストア | NAMCO Parks</title>\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\n<meta http-equiv=\"Content-Style-Type\" content=\"text/css\" />\n<meta http-equiv=\"Content-Script-Type\" content=\"text/javascript\" />\n<meta name=\"format-detection\" content=\"telephone=no\" />\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no\" />\n<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge,chrome=1\" />\n<title>【富山高岡店】7/4・5【抽選申込】 ONE PIECEカードゲーム 『ブースターパック 決戦の刻【OP-16】』購入権チケット | ナムコパークス オンラインストア | NAMCO Parks</title>\n<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" />\n<link href=\"https://fonts.googleapis.com/css2?family=Oswald:wght@200;300;400;500;600;700&display=swap\" rel=\"stylesheet\" />\n<link href=\"/client_info/BNAM_LBC_EC/view/userweb/lib/slick/slick.css?timestamp=1782449541732\" rel=\"stylesheet\" type=\"text/css\" />\n<link href=\"/client_info/BNAM_LBC_EC/view/userweb/lib/slick/slick-theme.css?timestamp=1782449541732\" rel=\"stylesheet\" type=\"text/css\" />\n<link href=\"/client_info/BNAM_LBC_EC/view/userweb/lib/mCustomScrollbar/jquery.mCustomScrollbar.min.css?timestamp=1782449541732\" rel=\"stylesheet\" type=\"text/css\" />\n<link href=\"/client_info/BNAM_LBC_EC/view/userweb/css/style.css?timestamp=1782449541732\" rel=\"stylesheet\" type=\"text/css\" />\n<link href=\"/client_info/BNAM_LBC_EC/view/userweb/css/style_modifier.css?timestamp=1782449541732\" rel=\"stylesheet\" type=\"text/css\" />\n<link href=\"/client_info/BNAM_LBC_EC/view/userweb/favicon.ico?timestamp=1782449541732\" rel=\"shortcut icon\" />\n<script src=\"/client_info/BNAM_LBC_EC/view/userweb/js/ebisu_lib.latest.js?timestamp=1782449541732\" type=\"text/javascript\" charset=\"utf-8\"></script>\n\n<script src=\"/"
+        }
+      },
+      {
+        "startedDateTime": "2026-06-27T13:01:25.373218+00:00",
+        "request": {
+          "method": "POST",
+          "url": "https://parks2.bandainamco-am.co.jp/cart_index.html",
+          "headers": {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36",
+            "Accept-Encoding": "gzip, deflate, br, zstd",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Connection": "keep-alive",
+            "Accept-Language": "ja,en;q=0.9"
+          },
+          "body": "{\"request\": \"\", \"item_cd2\": \"ECCL00000043_20260704_05_023\", \"item_cd\": \"ECCL00000043_20260704_05_023\", \"WISH_LIST_ID\": \"\", \"token\": \"5733493933d5b1e961e729355d563412\", \"key\": \"\", \"PRIORITY_ITEMPROPERTY_CD_MATRIX_0\": \"\", \"CART_AMOUNT_0\": \"1\"}"
+        },
+        "response": {
+          "status": 200,
+          "statusText": "200",
+          "headers": {
+            "Content-Type": "text/html;charset=utf-8",
+            "Transfer-Encoding": "chunked",
+            "Connection": "keep-alive",
+            "Date": "Sat, 27 Jun 2026 13:01:25 GMT",
+            "Vary": "Accept-Encoding,User-Agent",
+            "Content-Encoding": "gzip",
+            "Set-Cookie": "AWSALB=RZMN7DWW0UaCQsFi44zaqIDbEaGa98/z3hVyiSfRUKJaxI0XC9foLRwo7Sn9FpDT3nEJu7ljTCNilrlkEoM4FnAnndMuEfOtM+cDqijfzb2GmbWPrpmfpUdmfSyk; Expires=Sat, 04 Jul 2026 13:01:24 GMT; Path=/, AWSALBCORS=RZMN7DWW0UaCQsFi44zaqIDbEaGa98/z3hVyiSfRUKJaxI0XC9foLRwo7Sn9FpDT3nEJu7ljTCNilrlkEoM4FnAnndMuEfOtM+cDqijfzb2GmbWPrpmfpUdmfSyk; Expires=Sat, 04 Jul 2026 13:01:24 GMT; Path=/; SameSite=None; Secure, __s__esi_2844_UW=2F0DCD683A610DF0D6D0106FE1D73368.ebiuws-as-01-i-02fb25f7d9f7a6111; Path=/; Secure; SameSite=None; HttpOnly, __s__ack_2844_UW=503213525_2F0DCD683A610DF0D6D0106FE1D73368.ebiuws-as-01-i-02fb25f7d9f7a6111; Expires=Sun, 27-Jun-2027 13:01:24 GMT; Path=/; Secure; SameSite=None; HttpOnly, JSESSIONID=2F0DCD683A610DF0D6D0106FE1D73368.ebiuws-as-01-i-02fb25f7d9f7a6111; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:10 GMT, JSESSIONID=2F0DCD683A610DF0D6D0106FE1D73368.ebiuws-as-01-i-02fb25f7d9f7a6111; Path=/; Secure; SameSite=None; HttpOnly",
+            "Server": "Apache",
+            "X-Content-Type-Options": "nosniff",
+            "Pragma": "no-cache",
+            "Cache-control": "no-cache, no-store",
+            "Expires": "Thu, 01 Dec 1994 16:00:00 GMT",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Strict-Transport-Security": "max-age=63072000; includeSubDomains;",
+            "X-XSS-Protection": "1; mode=block",
+            "X-Cache": "Miss from cloudfront",
+            "Via": "1.1 74519eaf9467fae86738c8eb53833d12.cloudfront.net (CloudFront)",
+            "X-Amz-Cf-Pop": "HKG54-P2",
+            "X-Amz-Cf-Id": "4DsOdP7FRV58focWFOte_QEh19VS1x3kEz3cfcBNzQA31oLVvIWiCA=="
+          },
+          "cookies": {
+            "AWSALB": "RZMN7DWW0UaCQsFi44zaqIDbEaGa98/z3hVyiSfRUKJaxI0XC9foLRwo7Sn9FpDT3nEJu7ljTCNilrlkEoM4FnAnndMuEfOtM+cDqijfzb2GmbWPrpmfpUdmfSyk",
+            "AWSALBCORS": "RZMN7DWW0UaCQsFi44zaqIDbEaGa98/z3hVyiSfRUKJaxI0XC9foLRwo7Sn9FpDT3nEJu7ljTCNilrlkEoM4FnAnndMuEfOtM+cDqijfzb2GmbWPrpmfpUdmfSyk",
+            "__s__esi_2844_UW": "2F0DCD683A610DF0D6D0106FE1D73368.ebiuws-as-01-i-02fb25f7d9f7a6111",
+            "__s__ack_2844_UW": "503213525_2F0DCD683A610DF0D6D0106FE1D73368.ebiuws-as-01-i-02fb25f7d9f7a6111",
+            "JSESSIONID": "2F0DCD683A610DF0D6D0106FE1D73368.ebiuws-as-01-i-02fb25f7d9f7a6111"
+          },
+          "redirectUrl": "",
+          "bodySize": 27807,
+          "bodyPreview": "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n<html xmlns:aps=\"eb:AMAZON_PAYMENTS/view_amazon_payments.json\" xmlns:apv2=\"eb:AMAZON_PAYMENTS_V2/view_amazon_payments_v2_login.json\" xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"ja\" lang=\"ja\">\n<head>\n<title>ナムコパークス オンラインストア | NAMCO Parks</title>\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\n<meta http-equiv=\"Content-Style-Type\" content=\"text/css\" />\n<meta http-equiv=\"Content-Script-Type\" content=\"text/javascript\" />\n<meta name=\"format-detection\" content=\"telephone=no\" />\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no\" />\n<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge,chrome=1\" />\n<title>ナムコパークス オンラインストア | NAMCO Parks</title>\n<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" />\n<link href=\"https://fonts.googleapis.com/css2?family=Oswald:wght@200;300;400;500;600;700&display=swap\" rel=\"stylesheet\" />\n<link href=\"/client_info/BNAM_LBC_EC/view/userweb/lib/slick/slick.css?timestamp=1782449541732\" rel=\"stylesheet\" type=\"text/css\" />\n<link href=\"/client_info/BNAM_LBC_EC/view/userweb/lib/slick/slick-theme.css?timestamp=1782449541732\" rel=\"stylesheet\" type=\"text/css\" />\n<link href=\"/client_info/BNAM_LBC_EC/view/userweb/lib/mCustomScrollbar/jquery.mCustomScrollbar.min.css?timestamp=1782449541732\" rel=\"stylesheet\" type=\"text/css\" />\n<link href=\"/client_info/BNAM_LBC_EC/view/userweb/css/style.css?timestamp=1782449541732\" rel=\"stylesheet\" type=\"text/css\" />\n<link href=\"/client_info/BNAM_LBC_EC/view/userweb/css/style_modifier.css?timestamp=1782449541732\" rel=\"stylesheet\" type=\"text/css\" />\n<link href=\"/client_info/BNAM_LBC_EC/view/userweb/favicon.ico?timestamp=1782449541732\" rel=\"shortcut icon\" />\n<script src=\"/client_info/BNAM_LBC_EC/view/userweb/js/ebisu_lib.latest.js?timestamp=1782449541732\" type=\"text/javascript\" charset=\"utf-8\"></script>\n\n<script src=\"/client_"
+        }
+      }
+    ]
+  }
+}

@@ -408,6 +408,7 @@ class ManagedSession:
         self._tb = TokenBucket(cfg.requests_per_second, cfg.rate_burst)
         self.client: Optional[httpx.AsyncClient] = None
         self.signals = SessionSignals()
+        self._last_url: str = BASE_URL + "/"
 
     async def __aenter__(self) -> "ManagedSession":
         kw: Dict[str, Any] = dict(
@@ -464,17 +465,22 @@ class ManagedSession:
         METRICS.record("http.ms", ms)
         self._record_signals(path, resp)
         self._log.info(f"GET {path[:60]} → {resp.status_code} ({ms:.0f}ms)")
+        self._last_url = str(resp.url)
         return resp
 
     async def _do_post(self, path: str, data: Optional[Dict] = None, **kw) -> httpx.Response:
         await self._tb.acquire()
         url = f"{BASE_URL}{path}" if path.startswith("/") else path
+        hdrs = kw.pop("headers", {})
+        hdrs.setdefault("Referer", self._last_url)
+        hdrs.setdefault("Origin", BASE_URL)
         t0 = time.time()
-        resp = await self.client.post(url, data=data, **kw)
+        resp = await self.client.post(url, data=data, headers=hdrs, **kw)
         ms = (time.time() - t0) * 1000
         METRICS.record("http.ms", ms)
         self._record_signals(path, resp)
         self._log.info(f"POST {path[:60]} → {resp.status_code} ({ms:.0f}ms)")
+        self._last_url = str(resp.url)
         return resp
 
     async def get(self, path: str, **kw) -> httpx.Response:
@@ -773,28 +779,13 @@ async def step_get_cart(s: ManagedSession, ticket_url: str) -> Optional[Dict]:
     resp = await s.get("/cart_index.html")
     soup = BeautifulSoup(resp.text, "html.parser")
 
-    # Debug: save raw cart page
-    import json as _json
-    s._log.info(f"Cart page length: {len(resp.text)}")
     form = soup.select_one('form[name="cartFrm"]') or soup.select_one("form")
-    if form:
-        s._log.info(f"Form name={form.get('name')} action={form.get('action')} method={form.get('method')}")
-    else:
-        s._log.error("No form found on cart page!")
-        # Log first 2000 chars to see what we got
-        s._log.info(f"Cart page snippet: {resp.text[:2000]}")
     form_data: Dict[str, str] = _parse_form_element(form) if form else {}
 
     if not form_data.get("CART_AMOUNT_0"):
         form_data["CART_AMOUNT_0"] = "1"
     form_data["CART_INDEX_REFERER"] = ticket_url
-    # JS onclick: nextForm(cartFrm, null, 'cart_seisan.html', null)
-    # request param is null → JS sets it to '' (empty)
     form_data["request"] = ""
-    import json as _json
-    s._log.info(f"Cart POST data: {_json.dumps(form_data, ensure_ascii=False)}")
-    cookies = {k: v for k, v in s.client.cookies.items()}
-    s._log.info(f"Session cookies: {list(cookies.keys())}")
     return form_data
 
 

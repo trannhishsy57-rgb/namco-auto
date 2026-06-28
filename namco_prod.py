@@ -43,6 +43,7 @@ class AccountConfig:
     password: str
     target_store: str = ""
     proxy: str = ""
+    slot_index: int = -1   # -1 = auto (first available); 0+ = nth non-placeholder option
 
 @dataclass
 class AppConfig:
@@ -62,6 +63,10 @@ class AppConfig:
     circuit_recovery_timeout: float = 120.0
     event_keyword: str = "OP-16"
     lottery_keyword: str = "抽選"
+    slot_weights: List[int] = field(default_factory=list)   # e.g. [300,100,100,100] → assign slot 0 to first 300 accounts, etc.
+    lottery_open: str = ""          # "2026-07-04T10:00:00+09:00" or "HH:MM" (today JST)
+    pre_login_minutes: int = 10     # login this many minutes before lottery_open
+    keepalive_interval: int = 60    # seconds between session keepalive pings
     db_path: str = "namco_tasks.db"
     log_level: str = "INFO"
     mode: str = "checkout"
@@ -72,13 +77,32 @@ class AppConfig:
         with open(path, "rb") as f:
             raw = tomllib.load(f)
 
-        accounts = [AccountConfig(**a) for a in raw.get("accounts", [])]
+        acc_raw = raw.get("accounts", [])
+        # Remove slot_index from TOML if not supported by old configs (handled by default)
+        accounts = [AccountConfig(**{k: v for k, v in a.items() if k in AccountConfig.__dataclass_fields__}) for a in acc_raw]
         sched = raw.get("scheduler", {})
         retry_cfg = raw.get("retry", {})
         proxy_cfg = raw.get("proxy", {})
         rl = raw.get("rate_limit", {})
         cb = raw.get("circuit_breaker", {})
         tgt = raw.get("target", {})
+
+        # Auto-assign slot_index from slot_weights (for accounts that haven't set one explicitly)
+        weights = tgt.get("slot_weights", [])
+        if weights:
+            total = sum(weights)
+            cumulative: List[int] = []
+            c = 0
+            for w in weights:
+                c += w
+                cumulative.append(c)
+            for i, acc in enumerate(accounts):
+                if acc.slot_index < 0:
+                    pos = i % total
+                    for slot_i, threshold in enumerate(cumulative):
+                        if pos < threshold:
+                            acc.slot_index = slot_i
+                            break
 
         return cls(
             accounts=accounts,
@@ -97,6 +121,10 @@ class AppConfig:
             circuit_recovery_timeout=cb.get("recovery_timeout", 120.0),
             event_keyword=tgt.get("event_keyword", "OP-16"),
             lottery_keyword=tgt.get("lottery_keyword", "抽選"),
+            slot_weights=weights,
+            lottery_open=raw.get("lottery_open", ""),
+            pre_login_minutes=raw.get("pre_login_minutes", 10),
+            keepalive_interval=raw.get("keepalive_interval", 60),
             db_path=raw.get("db_path", "namco_tasks.db"),
             log_level=raw.get("log_level", "INFO"),
             mode=raw.get("mode", "checkout"),
@@ -301,7 +329,7 @@ class CircuitBreaker:
 # Module 2: FormParser
 # ─────────────────────────────────────────────────────────────────────────────
 
-def _parse_form_element(form) -> Dict[str, str]:
+def _parse_form_element(form, slot_overrides: Optional[Dict[str, int]] = None) -> Dict[str, str]:
     data: Dict[str, str] = {}
     for inp in form.select("input"):
         name = inp.get("name")
@@ -318,18 +346,26 @@ def _parse_form_element(form) -> Dict[str, str]:
             data[name] = inp.get("value", "")
     for sel in form.select("select"):
         name = sel.get("name")
-        if name:
-            opt = sel.select_one("option[selected]")
-            if opt and not opt.get("value", "").strip():
-                opt = None
-            if not opt:
-                for o in sel.select("option"):
-                    if o.get("value", "").strip():
-                        opt = o
-                        break
-            if not opt:
-                opt = sel.select_one("option")
-            data[name] = opt.get("value", "") if opt else ""
+        if not name:
+            continue
+        # Slot override: pick the nth non-placeholder option by index
+        if slot_overrides and name in slot_overrides:
+            idx = slot_overrides[name]
+            valid_opts = [o for o in sel.select("option") if o.get("value", "").strip()]
+            if valid_opts:
+                data[name] = valid_opts[min(idx, len(valid_opts) - 1)].get("value", "")
+                continue
+        opt = sel.select_one("option[selected]")
+        if opt and not opt.get("value", "").strip():
+            opt = None
+        if not opt:
+            for o in sel.select("option"):
+                if o.get("value", "").strip():
+                    opt = o
+                    break
+        if not opt:
+            opt = sel.select_one("option")
+        data[name] = opt.get("value", "") if opt else ""
     for ta in form.select("textarea"):
         name = ta.get("name")
         if name:
@@ -730,7 +766,7 @@ async def step_find_ticket(s: ManagedSession, cfg: AppConfig, store: str) -> Opt
     return tickets[0] if tickets else None
 
 
-async def step_add_cart(s: ManagedSession, ticket: Dict) -> bool:
+async def step_add_cart(s: ManagedSession, ticket: Dict, slot_index: int = -1) -> bool:
     resp = await s.get(ticket["url"])
     if resp.status_code != 200:
         s._log.error(f"Ticket page {resp.status_code}")
@@ -742,9 +778,11 @@ async def step_add_cart(s: ManagedSession, ticket: Dict) -> bool:
         s._log.error("No cart form on ticket page")
         return False
 
-    form_data = _parse_form_element(cart_form)
+    overrides = {"PRIORITY_ITEMPROPERTY_CD_MATRIX_0": slot_index} if slot_index >= 0 else None
+    form_data = _parse_form_element(cart_form, slot_overrides=overrides)
     form_data["request"] = "insert"
-    s._log.debug(f"Cart form keys: {list(form_data.keys())}")
+    if slot_index >= 0:
+        s._log.info(f"Slot index {slot_index} → {form_data.get('PRIORITY_ITEMPROPERTY_CD_MATRIX_0', '?')}")
 
     await s._delay_polite()
     resp = await s.post("/cart_index.html", data=form_data)
@@ -869,6 +907,112 @@ async def step_complete(s: ManagedSession, confirm_html: str) -> Optional[Dict]:
 # Module 8: Worker
 # ─────────────────────────────────────────────────────────────────────────────
 
+def _ts_ms(t0: float) -> int:
+    return int((time.time() - t0) * 1000)
+
+
+async def _do_booking(
+    s: ManagedSession,
+    account: AccountConfig,
+    cfg: AppConfig,
+    rec: Dict,
+    fsm: "BookingFSM",
+    log: logging.Logger,
+) -> None:
+    """Core booking flow starting from FIND (assumes session already logged in)."""
+    t0 = rec["_t0"]
+    step_ms = rec["step_ms"]
+
+    # FIND TICKET
+    _t = time.time()
+    fsm.go(FlowState.FIND); rec["states"].append("FIND")
+    ticket = await step_find_ticket(s, cfg, account.target_store)
+    step_ms["find"] = _ts_ms(_t)
+    if not ticket:
+        fsm.fail("no ticket"); rec["error"] = "No matching ticket found"; return
+
+    rec["ticket"] = ticket["name"]
+    log.info(f"Ticket: {ticket['name']}")
+
+    if cfg.mode == "dry":
+        fsm.go(FlowState.DONE); rec["states"].append("DONE")
+        rec["success"] = True; rec["note"] = "dry run"; return
+
+    await s._delay_polite()
+
+    # ADD TO CART
+    _t = time.time()
+    fsm.go(FlowState.CART); rec["states"].append("CART")
+    if not await step_add_cart(s, ticket, account.slot_index):
+        fsm.fail("cart failed"); rec["error"] = "Add to cart failed"; return
+    step_ms["cart"] = _ts_ms(_t)
+
+    if cfg.mode == "cart":
+        fsm.go(FlowState.DONE); rec["states"].append("DONE")
+        rec["success"] = True; rec["note"] = "cart only"; return
+
+    # GET CART PAGE
+    fsm.go(FlowState.GET_CART); rec["states"].append("GET_CART")
+    cart_data = await step_get_cart(s, ticket["url"])
+    if not cart_data:
+        fsm.fail("cart read failed"); rec["error"] = "Could not read cart"; return
+
+    await s._delay_polite()
+
+    # CHECKOUT (seisan)
+    _t = time.time()
+    fsm.go(FlowState.CHECKOUT); rec["states"].append("CHECKOUT")
+    seisan_html = await step_checkout(s, cart_data)
+    step_ms["seisan"] = _ts_ms(_t)
+    if not seisan_html:
+        fsm.fail("checkout failed"); rec["error"] = "Checkout failed"; return
+
+    await s._delay_polite()
+
+    # CONFIRM
+    _t = time.time()
+    fsm.go(FlowState.CONFIRM); rec["states"].append("CONFIRM")
+    confirm_html = await step_confirm(s, seisan_html)
+    step_ms["confirm"] = _ts_ms(_t)
+    if not confirm_html:
+        fsm.fail("confirm failed"); rec["error"] = "Confirm failed"; return
+
+    await s._delay_polite()
+
+    # PRE + COMPLETE
+    _t = time.time()
+    fsm.go(FlowState.PRE); rec["states"].append("PRE")
+    order = await step_complete(s, confirm_html)
+    step_ms["complete"] = _ts_ms(_t)
+    if order:
+        fsm.go(FlowState.COMPLETE); fsm.go(FlowState.DONE)
+        rec["states"].extend(["COMPLETE", "DONE"])
+        rec["success"] = True
+        rec["order_number"] = order["order_number"]
+    else:
+        fsm.fail("complete failed"); rec["error"] = "Order completion failed"
+
+    step_ms["total"] = _ts_ms(t0)
+
+
+def _finish_record(rec: Dict, fsm: "BookingFSM", results_path: str, log: logging.Logger):
+    rec.pop("_t0", None)
+    rec["finished_at"] = _now()
+    rec["final_state"] = fsm.state.value
+    with open(results_path, "a", encoding="utf-8") as f:
+        f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+    if rec["success"]:
+        ms = rec["step_ms"]
+        print(f"\n{'='*60}")
+        print(f"  SUCCESS  {rec['account']}")
+        print(f"  Order:   {rec['order_number']}")
+        print(f"  Ticket:  {rec['ticket']}")
+        print(f"  Timing:  login={ms.get('login','?')}ms find={ms.get('find','?')}ms cart={ms.get('cart','?')}ms total={ms.get('total','?')}ms")
+        print(f"{'='*60}")
+    else:
+        log.warning(f"FAILED {rec['account']}: {rec.get('error','—')}")
+
+
 async def run_account(
     account: AccountConfig,
     task: Dict,
@@ -877,18 +1021,19 @@ async def run_account(
     results_path: str,
 ) -> Dict:
     log = logging.getLogger(f"namco.worker.{account.email[:20]}")
-
-    # Resolve proxy: account-level takes priority, then pool
     proxy = account.proxy or await proxy_pool.acquire()
     log.info(
         f"account={account.email} store={account.target_store or 'any'} "
-        f"proxy={'yes' if proxy else 'none'} mode={cfg.mode}"
+        f"slot={account.slot_index} proxy={'yes' if proxy else 'none'} mode={cfg.mode}"
     )
 
     fsm = BookingFSM(account.email)
+    t0 = time.time()
     rec: Dict[str, Any] = {
+        "_t0": t0,
         "account": account.email,
         "target_store": account.target_store,
+        "slot_index": account.slot_index,
         "proxy": proxy or "none",
         "mode": cfg.mode,
         "started_at": _now(),
@@ -897,84 +1042,22 @@ async def run_account(
         "ticket": None,
         "error": None,
         "states": [],
+        "step_ms": {},
     }
 
     try:
         async with ManagedSession(proxy, cfg, account.email) as s:
-
             # LOGIN
+            _t = time.time()
             fsm.go(FlowState.LOGIN); rec["states"].append("LOGIN")
             if not await step_login(s, account.email, account.password):
                 fsm.fail("login failed"); rec["error"] = "Login failed"
+                _finish_record(rec, fsm, results_path, log)
                 return rec
+            rec["step_ms"]["login"] = _ts_ms(_t)
 
             await s._delay_polite()
-
-            # FIND TICKET
-            fsm.go(FlowState.FIND); rec["states"].append("FIND")
-            ticket = await step_find_ticket(s, cfg, account.target_store)
-            if not ticket:
-                fsm.fail("no ticket"); rec["error"] = "No matching ticket found"
-                return rec
-
-            rec["ticket"] = ticket["name"]
-            log.info(f"Ticket: {ticket['name']}")
-
-            if cfg.mode == "dry":
-                fsm.go(FlowState.DONE); rec["states"].append("DONE")
-                rec["success"] = True; rec["note"] = "dry run"
-                return rec
-
-            await s._delay_polite()
-
-            # ADD TO CART
-            fsm.go(FlowState.CART); rec["states"].append("CART")
-            if not await step_add_cart(s, ticket):
-                fsm.fail("cart failed"); rec["error"] = "Add to cart failed"
-                return rec
-
-            if cfg.mode == "cart":
-                fsm.go(FlowState.DONE); rec["states"].append("DONE")
-                rec["success"] = True; rec["note"] = "cart only"
-                return rec
-
-            # GET CART PAGE
-            fsm.go(FlowState.GET_CART); rec["states"].append("GET_CART")
-            cart_data = await step_get_cart(s, ticket["url"])
-            if not cart_data:
-                fsm.fail("cart read failed"); rec["error"] = "Could not read cart"
-                return rec
-
-            await s._delay_polite()
-
-            # CHECKOUT (seisan)
-            fsm.go(FlowState.CHECKOUT); rec["states"].append("CHECKOUT")
-            seisan_html = await step_checkout(s, cart_data)
-            if not seisan_html:
-                fsm.fail("checkout failed"); rec["error"] = "Checkout failed"
-                return rec
-
-            await s._delay_polite()
-
-            # CONFIRM
-            fsm.go(FlowState.CONFIRM); rec["states"].append("CONFIRM")
-            confirm_html = await step_confirm(s, seisan_html)
-            if not confirm_html:
-                fsm.fail("confirm failed"); rec["error"] = "Confirm failed"
-                return rec
-
-            await s._delay_polite()
-
-            # PRE + COMPLETE
-            fsm.go(FlowState.PRE); rec["states"].append("PRE")
-            order = await step_complete(s, confirm_html)
-            if order:
-                fsm.go(FlowState.COMPLETE); fsm.go(FlowState.DONE)
-                rec["states"].extend(["COMPLETE", "DONE"])
-                rec["success"] = True
-                rec["order_number"] = order["order_number"]
-            else:
-                fsm.fail("complete failed"); rec["error"] = "Order completion failed"
+            await _do_booking(s, account, cfg, rec, fsm, log)
 
     except Exception as e:
         log.exception(f"Worker crash: {e}")
@@ -985,23 +1068,157 @@ async def run_account(
         if rec["success"] and proxy:
             await proxy_pool.report_success(proxy)
 
-    rec["finished_at"] = _now()
-    rec["final_state"] = fsm.state.value
-
-    # Persist result
-    with open(results_path, "a", encoding="utf-8") as f:
-        f.write(json.dumps(rec, ensure_ascii=False) + "\n")
-
-    if rec["success"]:
-        print(f"\n{'='*60}")
-        print(f"  SUCCESS  {account.email}")
-        print(f"  Order:   {rec['order_number']}")
-        print(f"  Ticket:  {rec['ticket']}")
-        print(f"{'='*60}")
-    else:
-        log.warning(f"FAILED {account.email}: {rec['error']}")
-
+    _finish_record(rec, fsm, results_path, log)
     return rec
+
+
+async def run_prewarmed(
+    s: ManagedSession,
+    account: AccountConfig,
+    cfg: AppConfig,
+    results_path: str,
+) -> Dict:
+    """Run booking with an already-logged-in session (warmup mode)."""
+    log = logging.getLogger(f"namco.worker.{account.email[:20]}")
+    fsm = BookingFSM(account.email)
+    t0 = time.time()
+    rec: Dict[str, Any] = {
+        "_t0": t0,
+        "account": account.email,
+        "target_store": account.target_store,
+        "slot_index": account.slot_index,
+        "proxy": "warmed",
+        "mode": cfg.mode,
+        "started_at": _now(),
+        "success": False,
+        "order_number": None,
+        "ticket": None,
+        "error": None,
+        "states": ["LOGIN"],   # already logged in
+        "step_ms": {"login": 0},
+        "warmed": True,
+    }
+    try:
+        await _do_booking(s, account, cfg, rec, fsm, log)
+    except Exception as e:
+        log.exception(f"Worker crash: {e}")
+        rec["error"] = str(e)
+    _finish_record(rec, fsm, results_path, log)
+    return rec
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Warmup Scheduler — pre-login + keepalive + synchronized fire
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _parse_lottery_open(s: str) -> Optional[datetime]:
+    """Parse lottery open time.  Accepts:
+      "2026-07-04T10:00:00+09:00"  →  full ISO
+      "2026-07-04 10:00"           →  assumes JST (+09:00)
+      "10:00"                      →  today JST
+    Returns UTC-aware datetime, or None if empty/invalid.
+    """
+    if not s:
+        return None
+    from datetime import timezone, timedelta
+    JST = timezone(timedelta(hours=9))
+    s = s.strip()
+    try:
+        if "T" in s and "+" in s:
+            return datetime.fromisoformat(s)
+        if len(s) == 5 and ":" in s:  # "HH:MM"
+            now_jst = datetime.now(JST)
+            t = datetime.strptime(s, "%H:%M").replace(
+                year=now_jst.year, month=now_jst.month, day=now_jst.day, tzinfo=JST
+            )
+            return t
+        if " " in s:
+            t = datetime.strptime(s, "%Y-%m-%d %H:%M").replace(tzinfo=JST)
+            return t
+    except ValueError:
+        pass
+    return None
+
+
+class WarmupScheduler:
+    """
+    1. warmup_all()        — login all accounts (concurrent, throttled)
+    2. keepalive_until()   — ping sessions every cfg.keepalive_interval seconds
+    3. fire_all()          — run booking for all live sessions simultaneously
+    """
+
+    def __init__(self, cfg: AppConfig, results_path: str):
+        self._cfg = cfg
+        self._results_path = results_path
+        self._sessions: Dict[str, ManagedSession] = {}
+        self._log = logging.getLogger("namco.warmup")
+
+    async def warmup_all(self) -> int:
+        sem = asyncio.Semaphore(self._cfg.max_concurrent)
+
+        async def _login_one(acc: AccountConfig):
+            async with sem:
+                proxy = acc.proxy or ""
+                s = ManagedSession(proxy, self._cfg, acc.email)
+                await s.__aenter__()
+                ok = await step_login(s, acc.email, acc.password)
+                if ok:
+                    self._sessions[acc.email] = s
+                    self._log.info(f"Warmed ✓ {acc.email}  slot={acc.slot_index}")
+                else:
+                    await s.__aexit__(None, None, None)
+                    self._log.error(f"Warmup login FAILED: {acc.email}")
+
+        self._log.info(f"Warming up {len(self._cfg.accounts)} accounts …")
+        t0 = time.time()
+        await asyncio.gather(*[_login_one(acc) for acc in self._cfg.accounts])
+        elapsed = time.time() - t0
+        ok_count = len(self._sessions)
+        self._log.info(
+            f"Warmup done: {ok_count}/{len(self._cfg.accounts)} logged in ({elapsed:.1f}s)"
+        )
+        return ok_count
+
+    async def keepalive_until(self, target: datetime):
+        interval = self._cfg.keepalive_interval
+
+        async def _ping(email: str, s: ManagedSession):
+            try:
+                await s.get("/")
+            except Exception as e:
+                self._log.warning(f"Keepalive error {email}: {e}")
+
+        while True:
+            now = datetime.now(timezone.utc)
+            remaining = (target - now).total_seconds()
+            if remaining <= 2:
+                break
+            sleep_secs = min(interval, remaining - 2)
+            self._log.info(
+                f"Keepalive — {len(self._sessions)} sessions alive, "
+                f"{remaining:.0f}s until open, next ping in {sleep_secs:.0f}s"
+            )
+            await asyncio.gather(*[_ping(e, s) for e, s in self._sessions.items()])
+            await asyncio.sleep(sleep_secs)
+
+    async def fire_all(self) -> List[Dict]:
+        self._log.info(f"🔥 FIRING {len(self._sessions)} sessions simultaneously!")
+        account_map = {a.email: a for a in self._cfg.accounts}
+        tasks = [
+            run_prewarmed(s, account_map[email], self._cfg, self._results_path)
+            for email, s in self._sessions.items()
+            if email in account_map
+        ]
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+
+        # Close all sessions
+        for s in self._sessions.values():
+            try:
+                await s.__aexit__(None, None, None)
+            except Exception:
+                pass
+
+        return [r for r in results if isinstance(r, dict)]
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Module 9: GracefulShutdown
@@ -1116,35 +1333,62 @@ async def main():
 
     cfg = AppConfig.load(str(cfg_path))
     log = setup_logging(cfg.log_level)
+    cfg.results_file = str(script_dir / cfg.results_file)
 
     log.info(
         f"Namco Parks Prod | accounts={len(cfg.accounts)} "
         f"mode={cfg.mode} concurrent={cfg.max_concurrent}"
     )
+    if cfg.slot_weights:
+        log.info(f"Slot weights: {cfg.slot_weights} (total={sum(cfg.slot_weights)} accounts per cycle)")
 
-    # Task queue
+    # ── Warmup mode ──────────────────────────────────────────────────────────
+    if cfg.mode == "warmup":
+        lottery_open = _parse_lottery_open(cfg.lottery_open)
+        if not lottery_open:
+            log.error("warmup mode requires 'lottery_open' in config.toml  e.g. \"2026-07-04T10:00:00+09:00\"")
+            return []
+
+        now = datetime.now(timezone.utc)
+        warmup_at = lottery_open - __import__("datetime").timedelta(minutes=cfg.pre_login_minutes)
+
+        if now < warmup_at:
+            wait_secs = (warmup_at - now).total_seconds()
+            log.info(
+                f"Lottery opens at {lottery_open.isoformat()}  "
+                f"Pre-login at {warmup_at.isoformat()}  "
+                f"Sleeping {wait_secs:.0f}s …"
+            )
+            await asyncio.sleep(wait_secs)
+
+        scheduler = WarmupScheduler(cfg, cfg.results_file)
+        ok = await scheduler.warmup_all()
+        if ok == 0:
+            log.error("All warmup logins failed — aborting")
+            return []
+
+        await scheduler.keepalive_until(lottery_open)
+
+        log.info(f"Lottery open! Firing all {ok} sessions …")
+        results = await scheduler.fire_all()
+        print_summary(results, log)
+        return results
+
+    # ── Normal / scheduled mode ───────────────────────────────────────────────
     db_path = str(script_dir / cfg.db_path)
     queue = TaskQueue(db_path)
     await queue.init()
     await queue.enqueue_accounts(cfg.accounts, cfg.mode)
     log.info(f"Queue summary: {await queue.summary()}")
 
-    # Proxy pool
     proxy_pool = ProxyPool(cfg.proxy_pool, cfg.proxy_max_fails)
     if cfg.proxy_pool:
         log.info(f"Proxy pool: {len(cfg.proxy_pool)} proxies")
     else:
         log.info("No proxies configured — running direct")
 
-    # Results file
-    cfg.results_file = str(script_dir / cfg.results_file)
-
-    # Run
     results = await run_scheduler(cfg, queue, proxy_pool)
-
-    # Report
     print_summary(results, log)
-
     return results
 
 

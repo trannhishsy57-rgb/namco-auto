@@ -1,20 +1,47 @@
 db_path      = "namco_tasks.db"
 log_level    = "INFO"
-mode         = "checkout"   # dry / cart / checkout
 results_file = "results.jsonl"
 
-[[accounts]]
-email        = "rekv68w80t@livee.email"
-password     = "Qwe123456"
-target_store = ""           # 留空则自动选第一个可用店铺
-proxy        = ""           # 留空则不用代理
+# ── 运行模式 ──────────────────────────────────────────────────────────────────
+# "checkout"  : 完整流程 login→find→cart→seisan→confirm→complete
+# "cart"      : 只到加购物车为止
+# "dry"       : 只登录+查票，不下单
+# "warmup"    : 提前登录所有账号，在 lottery_open 时刻同步触发抢票
+mode = "checkout"
 
-# 添加更多账号：
+# ── 预热定时（仅 mode="warmup" 时生效）───────────────────────────────────────
+lottery_open       = ""    # 开抢时刻 e.g. "2026-07-04T10:00:00+09:00"
+pre_login_minutes  = 10    # 提前几分钟完成所有账号登录
+keepalive_interval = 60    # 保活 ping 间隔（秒）
+
+# ── 账号列表 ─────────────────────────────────────────────────────────────────
+# slot_index: -1=自动选第一个时间段; 0=第1个; 1=第2个; 以此类推
+# 如果配置了 [target].slot_weights，则自动按权重分配，无需手动填 slot_index
+
+[[accounts]]
+email        = "v947cbyvoy@livee.email"
+password     = "Qwe123456"
+target_store = ""
+proxy        = ""
+
+[[accounts]]
+email        = "r9syrdt4j@livee.email"
+password     = "Qwe123456"
+target_store = ""
+proxy        = ""
+
+[[accounts]]
+email        = "wht9jlz2@livee.email"
+password     = "Qwe123456"
+target_store = ""
+proxy        = ""
+
+# 添加更多账号（后续扩展至10/100/1000）:
 # [[accounts]]
-# email        = "account2@example.com"
-# password     = "pass2"
-# target_store = "東京"
-# proxy        = "http://user:pass@jp-proxy2:port"
+# email        = "account4@livee.email"
+# password     = "Qwe123456"
+# target_store = ""   # 留空自动选店铺；填"東京"则只选东京场
+# slot_index   = 2    # 手动指定第3个时间段（0-based）
 
 [scheduler]
 max_concurrent = 3
@@ -22,22 +49,21 @@ delay_min      = 3.0
 delay_max      = 7.0
 
 [retry]
-max_attempts  = 3
-initial_wait  = 5.0
-max_wait      = 40.0
-jitter        = 5.0
+max_attempts = 3
+initial_wait = 5.0
+max_wait     = 40.0
+jitter       = 5.0
 
 [proxy]
-# 全局代理池（账号未单独配置代理时轮流使用）
 pool      = []
 max_fails = 3
 # pool = [
-#   "http://user:pass@jp-residential1:port",
-#   "http://user:pass@jp-residential2:port",
+#   "http://user:pass@jp-proxy1:port",
+#   "http://user:pass@jp-proxy2:port",
 # ]
 
 [rate_limit]
-requests_per_second = 0.5   # 每账号每秒最多 0.5 个请求（即 2s 间隔）
+requests_per_second = 0.5
 burst               = 2
 
 [circuit_breaker]
@@ -47,3 +73,13 @@ recovery_timeout  = 120.0
 [target]
 event_keyword   = "OP-16"
 lottery_keyword = "抽選"
+
+# ── 时间段自动分配权重 ────────────────────────────────────────────────────────
+# 对应票页面 PRIORITY_ITEMPROPERTY_CD_MATRIX_0 下拉框选项（排除「选択してください」后）
+# 索引 0=7/4 11:00, 1=7/4 13:30, 2=7/4 16:00, 3=7/4 18:30
+#      4=7/5 11:00, 5=7/5 13:30, 6=7/5 16:00, 7=7/5 18:30
+# 例：1000个账号 → 300个抢第0时段，其余每时段100个
+# slot_weights = [300, 100, 100, 100, 100, 100, 100, 100]
+#
+# 留空 = 所有账号都选第一个可用时段（当前3账号测试用）
+slot_weights = []

@@ -57,10 +57,10 @@
 - 登录页: `/login.html`
 - 客服咨询窗口: `https://bnam-customer.my.site.com/NamcoParks/s/createrecord/InquirySpot`
 
-**账号：**
-- 邮箱: `rekv68w80t@livee.email`
-- 密码: `Qwe123456`
-- 会员号: `B001866278593`
+**账号：**（已脱敏 — 旧测试账号，实际凭据见本地 config.toml，勿提交明文）
+- 邮箱: `（redacted）`
+- 密码: `（redacted）`
+- 会员号: `（redacted）`
 - 目标店铺: 富山高岡店
 
 **Session Cookies（登录后获得）：**

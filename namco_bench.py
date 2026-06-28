@@ -118,54 +118,56 @@ async def _run_one(
 ):
     async with sem:
         t0 = time.monotonic()
-        outcome = "failed"        # success | login_failed | no_ticket | cart_err | net_error | exception
-        async with ManagedSession(proxy, cfg, f"bench-{account_index}") as s:
-            try:
-                # ── 1. 登录 ──────────────────────────────────────
-                if not await step_login(s, email, password):
-                    outcome = "login_failed"
-                elif depth == "login":
-                    outcome = "success"
-                else:
-                    await asyncio.sleep(random.uniform(cfg.delay_min, cfg.delay_max))
-
-                    # ── 2. 找票 ──────────────────────────────────
-                    ticket = await step_find_ticket(s, cfg, "")
-                    if not ticket:
-                        outcome = "no_ticket"
-                    elif depth == "find":
+        outcome = "failed"
+        signals_snapshot = None
+        try:
+            async with ManagedSession(proxy, cfg, f"bench-{account_index}") as s:
+                try:
+                    if not await step_login(s, email, password):
+                        outcome = "login_failed"
+                    elif depth == "login":
                         outcome = "success"
                     else:
                         await asyncio.sleep(random.uniform(cfg.delay_min, cfg.delay_max))
-
-                        # ── 3. 加购物车页（dry：只 GET，不提交） ──
-                        resp = await s.get(ticket["url"])
-                        err = check_error(BeautifulSoup(resp.text, "html.parser"))
-                        if err:
-                            outcome = "cart_err"
-                            error_counts[f"cart_err:{err[:40]}"] = \
-                                error_counts.get(f"cart_err:{err[:40]}", 0) + 1
-                        else:
+                        ticket = await step_find_ticket(s, cfg, "")
+                        if not ticket:
+                            outcome = "no_ticket"
+                        elif depth == "find":
                             outcome = "success"
+                        else:
+                            await asyncio.sleep(random.uniform(cfg.delay_min, cfg.delay_max))
+                            resp = await s.get(ticket["url"])
+                            err = check_error(BeautifulSoup(resp.text, "html.parser"))
+                            if err:
+                                outcome = "cart_err"
+                                error_counts[f"cart_err:{err[:40]}"] = \
+                                    error_counts.get(f"cart_err:{err[:40]}", 0) + 1
+                            else:
+                                outcome = "success"
+                except Exception as e:
+                    name = type(e).__name__
+                    error_counts[name] = error_counts.get(name, 0) + 1
+                    if name in ("ConnectError", "ConnectTimeout", "ReadTimeout",
+                                "TimeoutException", "RemoteProtocolError", "ProxyError"):
+                        outcome = "net_error"
+                    else:
+                        outcome = "exception"
+                    log.warning(f"bench-{account_index} error: {name}: {str(e)[:120]}")
+                finally:
+                    signals_snapshot = s.signals
 
-            except (Exception,) as e:
-                name = type(e).__name__
-                error_counts[name] = error_counts.get(name, 0) + 1
-                if name in ("ConnectError", "ConnectTimeout", "ReadTimeout",
-                            "TimeoutException", "RemoteProtocolError", "ProxyError"):
-                    outcome = "net_error"
-                else:
-                    outcome = "exception"
-                log.debug(f"bench-{account_index} error: {name}: {str(e)[:80]}")
+        except Exception as e:
+            name = type(e).__name__
+            error_counts[name] = error_counts.get(name, 0) + 1
+            outcome = "net_error" if "Connect" in name or "Timeout" in name else "exception"
+            log.warning(f"bench-{account_index} session error: {name}: {str(e)[:120]}")
 
-            # ── 滚动 HTTP 信号（真相来源，与 outcome 独立）──────
-            sg = s.signals
-            result.rate_limited_503 += sg.http_503
-            result.ip_blocked_403   += sg.http_403
-            result.session_expired  += sg.redirect_login
-            result.captcha_hit      += sg.captcha
+        if signals_snapshot:
+            result.rate_limited_503 += signals_snapshot.http_503
+            result.ip_blocked_403   += signals_snapshot.http_403
+            result.session_expired  += signals_snapshot.redirect_login
+            result.captcha_hit      += signals_snapshot.captcha
 
-        # ── 结算 outcome（每个账号只计一次成功/失败）──────────
         if outcome == "success":
             result.success += 1
             result.latencies.append((time.monotonic() - t0) * 1000)

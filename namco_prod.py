@@ -401,17 +401,15 @@ class ManagedSession:
         self.signals = SessionSignals()
 
     async def __aenter__(self) -> "ManagedSession":
-        proxy_map: Optional[Dict] = (
-            {"https://": self._proxy, "http://": self._proxy}
-            if self._proxy else None
-        )
-        self.client = httpx.AsyncClient(
+        kw: Dict[str, Any] = dict(
             headers=_HEADERS,
             follow_redirects=True,
             verify=False,
             timeout=httpx.Timeout(30.0, connect=10.0),
-            proxies=proxy_map,
         )
+        if self._proxy:
+            kw["proxy"] = self._proxy
+        self.client = httpx.AsyncClient(**kw)
         return self
 
     async def __aexit__(self, *_):

@@ -319,7 +319,14 @@ def _parse_form_element(form) -> Dict[str, str]:
     for sel in form.select("select"):
         name = sel.get("name")
         if name:
-            opt = sel.select_one("option[selected]") or sel.select_one("option")
+            opt = sel.select_one("option[selected]")
+            if not opt:
+                for o in sel.select("option"):
+                    if o.get("value", "").strip():
+                        opt = o
+                        break
+            if not opt:
+                opt = sel.select_one("option")
             data[name] = opt.get("value", "") if opt else ""
     for ta in form.select("textarea"):
         name = ta.get("name")

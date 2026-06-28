@@ -779,6 +779,9 @@ async def step_get_cart(s: ManagedSession, ticket_url: str) -> Optional[Dict]:
     if not form_data.get("CART_AMOUNT_0"):
         form_data["CART_AMOUNT_0"] = "1"
     form_data["CART_INDEX_REFERER"] = ticket_url
+    # JS sets request=seisan when "購入手続きに進む" is clicked
+    form_data["request"] = "seisan"
+    s._log.debug(f"Cart form keys: {list(form_data.keys())}")
     return form_data
 
 

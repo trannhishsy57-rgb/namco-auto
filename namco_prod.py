@@ -320,6 +320,8 @@ def _parse_form_element(form) -> Dict[str, str]:
         name = sel.get("name")
         if name:
             opt = sel.select_one("option[selected]")
+            if opt and not opt.get("value", "").strip():
+                opt = None
             if not opt:
                 for o in sel.select("option"):
                     if o.get("value", "").strip():

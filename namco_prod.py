@@ -743,6 +743,12 @@ async def step_add_cart(s: ManagedSession, ticket: Dict) -> bool:
     await s._delay_polite()
     resp = await s.post("/cart_index.html", data=form_data)
 
+    # "カートに追加されました" is a success message that Ebisu renders
+    # inside the #error CSS container — check for it before check_error.
+    if "カートに追加されました" in resp.text or "カート" in resp.text:
+        METRICS.inc("cart.ok")
+        return True
+
     soup = BeautifulSoup(resp.text, "html.parser")
     err = check_error(soup)
     if err:
@@ -750,10 +756,6 @@ async def step_add_cart(s: ManagedSession, ticket: Dict) -> bool:
         METRICS.inc("cart.fail")
         return False
 
-    # Accept JSON response (AJAX mode) or HTML cart page (form mode)
-    if "カート" in resp.text:
-        METRICS.inc("cart.ok")
-        return True
     try:
         j = resp.json()
         s._log.debug(f"Cart JSON: {str(j)[:200]}")

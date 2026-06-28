@@ -15,3 +15,11 @@ results_summary.json
 venv/
 __pycache__/
 *.pyc
+
+# Node / playwright cruft (unused, removed from tracking)
+node_modules/
+package.json
+package-lock.json
+
+# Dead config (code reads config.toml only)
+config.yaml

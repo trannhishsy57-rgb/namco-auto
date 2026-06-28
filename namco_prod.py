@@ -68,6 +68,7 @@ class AppConfig:
     pre_login_minutes: int = 10     # login this many minutes before lottery_open
     keepalive_interval: int = 60    # seconds between session keepalive pings
     race_mode: bool = True          # warmup/racetest: strip polite delays + rate limit for max speed
+    fire_max_concurrent: int = 0    # fire_all concurrency cap (0=unlimited; set 50-100 at scale to avoid 503/ban)
     db_path: str = "namco_tasks.db"
     log_level: str = "INFO"
     mode: str = "checkout"
@@ -80,8 +81,18 @@ class AppConfig:
             raw = tomllib.load(f)
 
         acc_raw = raw.get("accounts", [])
-        # Remove slot_index from TOML if not supported by old configs (handled by default)
-        accounts = [AccountConfig(**{k: v for k, v in a.items() if k in AccountConfig.__dataclass_fields__}) for a in acc_raw]
+        # Filter to known fields, but WARN on unknown keys so a typo like "target_stroe"
+        # or "slot_idx" doesn't silently fall back to defaults (empty store / slot=-1)
+        # and surface only on lottery day.
+        _valid = AccountConfig.__dataclass_fields__
+        accounts = []
+        for a in acc_raw:
+            unknown = [k for k in a if k not in _valid]
+            if unknown:
+                logging.getLogger("namco").warning(
+                    f"account {a.get('email','?')}: 未知配置项 {unknown} 已忽略 — 检查拼写(target_store/slot_index/proxy)"
+                )
+            accounts.append(AccountConfig(**{k: v for k, v in a.items() if k in _valid}))
         sched = raw.get("scheduler", {})
         retry_cfg = raw.get("retry", {})
         proxy_cfg = raw.get("proxy", {})
@@ -133,6 +144,7 @@ class AppConfig:
             pre_login_minutes=raw.get("pre_login_minutes", 10),
             keepalive_interval=raw.get("keepalive_interval", 60),
             race_mode=raw.get("race_mode", True),
+            fire_max_concurrent=raw.get("fire_max_concurrent", 0),
             db_path=raw.get("db_path", "namco_tasks.db"),
             log_level=raw.get("log_level", "INFO"),
             mode=raw.get("mode", "checkout"),
@@ -361,12 +373,16 @@ class CircuitBreaker:
     async def record_failure(self):
         async with self._lock:
             self._failures += 1
-            self._opened_at = time.time()
+            # Set _opened_at only on the CLOSED/HALF_OPEN → OPEN transition, so it
+            # means "when the breaker opened" (recovery is timed from there), not
+            # "last failure time".
             if self._state == _CBState.HALF_OPEN:
                 self._state = _CBState.OPEN
+                self._opened_at = time.time()
                 self._log.warning("Circuit re-OPEN (half-open probe failed)")
-            elif self._failures >= self._threshold:
+            elif self._failures >= self._threshold and self._state != _CBState.OPEN:
                 self._state = _CBState.OPEN
+                self._opened_at = time.time()
                 self._log.warning(f"Circuit OPEN after {self._failures} failures")
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -397,6 +413,11 @@ def _parse_form_element(form, slot_overrides: Optional[Dict[str, int]] = None) -
             idx = slot_overrides[name]
             valid_opts = [o for o in sel.select("option") if o.get("value", "").strip()]
             if valid_opts:
+                if idx >= len(valid_opts):
+                    logging.getLogger("namco").warning(
+                        f"slot_index={idx} 越界:{name} 只有 {len(valid_opts)} 个时段,已退到最后一个 "
+                        f"— 检查 config 的 slot_weights/slot_index(此警告在 stage 阶段出现,开抢前可修)"
+                    )
                 data[name] = valid_opts[min(idx, len(valid_opts) - 1)].get("value", "")
                 continue
         opt = sel.select_one("option[selected]")
@@ -855,7 +876,11 @@ async def step_find_ticket(s: ManagedSession, cfg: AppConfig, store: str) -> Opt
         if filtered:
             s._log.info(f"Filtered {len(filtered)} matching '{store}'")
             return filtered[0]
-        s._log.warning(f"No ticket matching '{store}', trying first available")
+        # Do NOT silently fall back to another store — that violates 一人一店一次 and
+        # would enter the account into a store it never chose. Fail the FIND step so
+        # the operator notices, rather than抢错店 and finding out at the counter.
+        s._log.error(f"No ticket matching store '{store}' — refusing to fall back to another store")
+        return None
 
     return tickets[0] if tickets else None
 
@@ -1273,6 +1298,9 @@ def _parse_lottery_open(s: str) -> Optional[datetime]:
     JST = timezone(timedelta(hours=9))
     s = s.strip()
     try:
+        if s.endswith("Z"):
+            # ISO 8601 UTC "Z" suffix — fromisoformat (<3.11) rejects it; normalize.
+            return datetime.fromisoformat(s[:-1] + "+00:00")
         if "T" in s and "+" in s:
             return datetime.fromisoformat(s)
         if len(s) == 5 and ":" in s:  # "HH:MM"
@@ -1477,10 +1505,22 @@ class WarmupScheduler:
         # Single common T=0 reference so every account's offsets are comparable
         fire_t0 = time.time()
         fired = [(email, s) for email, s in self._sessions.items() if email in account_map]
-        tasks = [
-            run_prewarmed(s, account_map[email], self._cfg, self._results_path, fire_t0=fire_t0)
-            for email, s in fired
-        ]
+        # Optional concurrency cap: at 1000 accounts, firing all cart POSTs at the exact
+        # same instant can trip 503/IP-ban. fire_max_concurrent=0 keeps the original
+        # all-at-once behaviour (best for small N); set 50-100 at scale. Accounts beyond
+        # the cap fire slightly later — their fire_offset_ms reflects that honestly.
+        cap = self._cfg.fire_max_concurrent
+        sem = asyncio.Semaphore(cap) if cap and cap > 0 else None
+
+        async def _run(email: str, s: ManagedSession):
+            if sem is None:
+                return await run_prewarmed(s, account_map[email], self._cfg, self._results_path, fire_t0=fire_t0)
+            async with sem:
+                return await run_prewarmed(s, account_map[email], self._cfg, self._results_path, fire_t0=fire_t0)
+
+        if sem is not None:
+            self._log.info(f"Fire concurrency capped at {cap}")
+        tasks = [_run(email, s) for email, s in fired]
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
         # Close all sessions
@@ -1518,7 +1558,10 @@ class GracefulShutdown:
 
     def setup(self):
         loop = asyncio.get_event_loop()
-        for sig in (signal.SIGINT,):
+        sigs = [signal.SIGINT]
+        if hasattr(signal, "SIGTERM"):
+            sigs.append(signal.SIGTERM)   # systemd `stop` sends SIGTERM, not SIGINT
+        for sig in sigs:
             try:
                 loop.add_signal_handler(sig, self._stop.set)
             except (NotImplementedError, AttributeError):
@@ -1802,6 +1845,9 @@ async def main():
         f"Namco Parks Prod | accounts={len(cfg.accounts)} "
         f"mode={cfg.mode} concurrent={cfg.max_concurrent}"
     )
+    if not cfg.accounts:
+        log.error("config.toml 没有任何 [[accounts]] — 无账号可跑。请检查账号段是否被注释或拼写错误。")
+        return []
     if cfg.slot_weights:
         log.info(f"Slot weights: {cfg.slot_weights} (total={sum(cfg.slot_weights)} accounts per cycle)")
     _log_slot_distribution(cfg, log)

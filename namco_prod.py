@@ -788,8 +788,13 @@ async def step_get_cart(s: ManagedSession, ticket_url: str) -> Optional[Dict]:
     if not form_data.get("CART_AMOUNT_0"):
         form_data["CART_AMOUNT_0"] = "1"
     form_data["CART_INDEX_REFERER"] = ticket_url
-    form_data["request"] = "seisan"
+    # JS onclick: nextForm(cartFrm, null, 'cart_seisan.html', null)
+    # request param is null → JS sets it to '' (empty)
+    form_data["request"] = ""
+    import json as _json
     s._log.info(f"Cart POST data: {_json.dumps(form_data, ensure_ascii=False)}")
+    cookies = {k: v for k, v in s.client.cookies.items()}
+    s._log.info(f"Session cookies: {list(cookies.keys())}")
     return form_data
 
 
